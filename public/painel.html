@@ -12,12 +12,64 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./css/nexoraai-panel.css">
+
+  <!-- 🔹 Apenas MELHORIA VISUAL: não altera nenhuma funcionalidade -->
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #e0f2fe 0%, transparent 55%),
+        radial-gradient(1000px 700px at 90% 0%, #eef2ff 0%, transparent 50%),
+        linear-gradient(to bottom, #f8fafc, #e2e8f0);
+    }
+
+    /* Efeito geral dos cards */
+    .card {
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+      border-color: rgba(79, 70, 229, 0.35);
+    }
+
+    /* Sidebar: efeito visual e ícones maiores */
+    .sidebar-item {
+      transition: background 0.18s ease, transform 0.16s ease, border-color 0.18s ease;
+      border: 1px solid transparent;
+    }
+    .sidebar-item:hover {
+      background: rgba(15, 23, 42, 0.9);
+      border-color: rgba(148, 163, 184, 0.4);
+      transform: translateX(2px);
+    }
+    .sidebar-item.active {
+      background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.35), rgba(15, 23, 42, 1));
+      border: 1px solid rgba(129, 140, 248, 0.6);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.6);
+    }
+    /* Ícone do menu lateral – mais presença */
+    .sidebar-item > span {
+      width: 2.75rem;   /* maior */
+      height: 2.75rem;
+      border-radius: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 0%, rgba(129, 140, 248, 0.75), rgba(15, 23, 42, 1));
+      border: 1px solid rgba(129, 140, 248, 0.5);
+      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.75);
+    }
+    .sidebar-item > span i {
+      font-size: 1.1rem;
+    }
+  </style>
 </head>
 
 <body class="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-900">
 
-  <!-- SIDEBAR -->
-  <aside class="w-full lg:w-72 bg-slate-950 text-slate-300 flex flex-col relative z-50 flex-shrink-0">
+  <!-- SIDEBAR – visível apenas em telas grandes -->
+  <aside class="hidden lg:flex lg:w-72 bg-slate-950 text-slate-300 flex-col relative z-50 flex-shrink-0">
     <div class="p-4 sm:p-6 border-b border-slate-800/70">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-indigo-600/20 flex items-center justify-center border border-indigo-500/20">
@@ -197,6 +249,28 @@
           <i class="fa-solid fa-lightbulb mr-1"></i> Sugestão
         </button>
       </div>
+
+      <!-- 🔹 MOBILE USER BAR: mostra nome do usuário no mobile e atalho para o perfil -->
+      <div class="px-4 sm:px-8 pb-3 flex items-center justify-between gap-3 lg:hidden">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-sm">
+            U
+          </div>
+          <div>
+            <p class="text-[11px] text-slate-500">Logado como</p>
+            <p class="text-sm font-semibold text-slate-900 max-w-[160px] truncate" data-user-name>Usuário</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-sm"
+          title="Meu perfil"
+          onclick="openProfileFromMobile()"
+        >
+          <i class="fa-solid fa-gear text-sm"></i>
+        </button>
+      </div>
+      <!-- 🔹 FIM MOBILE USER BAR -->
     </header>
 
     <!-- DASHBOARD -->
@@ -206,6 +280,53 @@
           <h2 class="text-2xl font-bold text-slate-900">Painel Central</h2>
           <p class="text-sm text-slate-600">Resumo de performance e próximos passos.</p>
         </div>
+      </div>
+
+      <!-- MENU PRINCIPAL MOBILE (apenas no celular) -->
+      <div class="grid grid-cols-2 gap-3 mb-6 lg:hidden">
+        <button
+          type="button"
+          onclick='document.querySelector("[data-section=dashboard]").click()'
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+        >
+          <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center mb-2">
+            <i class="fa-solid fa-chart-pie text-slate-700 text-sm"></i>
+          </div>
+          Dashboard
+        </button>
+
+        <button
+          type="button"
+          onclick='document.querySelector("[data-section=create-mode]").click()'
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+        >
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-2">
+            <i class="fa-solid fa-pen-nib text-indigo-600 text-sm"></i>
+          </div>
+          Criar Conteúdo
+        </button>
+
+        <button
+          type="button"
+          onclick='document.querySelector("[data-section=brands]").click()'
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+        >
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-2">
+            <i class="fa-solid fa-briefcase text-emerald-600 text-sm"></i>
+          </div>
+          Minhas Marcas
+        </button>
+
+        <button
+          type="button"
+          onclick='document.querySelector("[data-section=history]").click()'
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+        >
+          <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center mb-2">
+            <i class="fa-solid fa-clock-rotate-left text-purple-600 text-sm"></i>
+          </div>
+          Histórico
+        </button>
       </div>
 
       <!-- CARDS PRINCIPAIS + IDEIA AUTOMÁTICA -->
@@ -243,7 +364,7 @@
           <p class="text-xs text-slate-500 mt-1">Total</p>
         </div>
 
-        <!-- IDEIA AUTOMÁTICA AGORA AQUI -->
+        <!-- IDEIA AUTOMÁTICA -->
         <div id="autoIdeaBox" class="card p-6 rounded-2xl shadow-sm border border-slate-200 bg-gradient-to-br from-indigo-600 to-purple-700 text-white relative overflow-hidden flex flex-col justify-center items-start">
           <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
           <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-xl"></div>
@@ -287,9 +408,18 @@
 
     <!-- MINHAS MARCAS -->
     <section id="brands" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Minhas Marcas</h2>
-        <p class="text-sm text-slate-600">Cadastre cada marca para evitar conteúdo genérico.</p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Minhas Marcas</h2>
+          <p class="text-sm text-slate-600">Cadastre cada marca para evitar conteúdo genérico.</p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -363,11 +493,20 @@
 
     <!-- SUGESTÕES -->
     <section id="templates" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Sugestões Estratégicas</h2>
-        <p class="text-sm text-slate-600">
-          Ideias automáticas baseadas no mês atual e na cultura brasileira.
-        </p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Sugestões Estratégicas</h2>
+          <p class="text-sm text-slate-600">
+            Ideias automáticas baseadas no mês atual e na cultura brasileira.
+          </p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="flex flex-col items-center justify-center min-h-[320px] sm:min-h-[400px] bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 text-center max-w-3xl mx-auto">
@@ -390,9 +529,18 @@
 
     <!-- HISTÓRICO -->
     <section id="history" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Histórico</h2>
-        <p class="text-sm text-slate-600">Veja e recarregue conteúdos gerados anteriormente.</p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Histórico</h2>
+          <p class="text-sm text-slate-600">Veja e recarregue conteúdos gerados anteriormente.</p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -410,9 +558,18 @@
 
     <!-- ESCOLHA TIPO DE CRIAÇÃO -->
     <section id="create-mode" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo</h2>
-        <p class="text-sm text-slate-600">Escolha se o conteúdo será para uso comercial (empresas, marcas) ou pessoal.</p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo</h2>
+          <p class="text-sm text-slate-600">Escolha se o conteúdo será para uso comercial (empresas, marcas) ou pessoal.</p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
@@ -450,11 +607,20 @@
 
     <!-- CRIAÇÃO PESSOAL -->
     <section id="create-personal" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo pessoal</h2>
-        <p class="text-sm text-slate-600">
-          Escolha o tipo de arte pessoal, defina o objetivo e o que você quer comunicar. A IA entrega arte + legenda.
-        </p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo pessoal</h2>
+          <p class="text-sm text-slate-600">
+            Escolha o tipo de arte pessoal, defina o objetivo e o que você quer comunicar. A IA entrega arte + legenda.
+          </p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="flex flex-col xl:flex-row gap-8">
@@ -464,7 +630,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <select id="personalTypeSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-indigo-500">
                 <option value="">Selecione o tipo de conteúdo...</option>
-                <!-- (lista original mantida) -->
+                <!-- lista original mantida -->
                 <option>Flyer de aniversário infantil</option>
                 <option>Flyer de aniversário adulto</option>
                 <option>Convite de aniversário simples</option>
@@ -630,11 +796,20 @@
 
     <!-- CRIAÇÃO COMERCIAL -->
     <section id="create" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Criar novo conteúdo (Comercial)</h2>
-        <p class="text-sm text-slate-600">
-          Defina marca, formato e briefing. A IA entrega post completo com visual + legenda.
-        </p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Criar novo conteúdo (Comercial)</h2>
+          <p class="text-sm text-slate-600">
+            Defina marca, formato e briefing. A IA entrega post completo com visual + legenda.
+          </p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="flex flex-col xl:flex-row gap-8">
@@ -770,11 +945,20 @@
 
     <!-- PERFIL -->
     <section id="profile" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Meu Perfil</h2>
-        <p class="text-sm text-slate-600">
-          Gerencie suas informações de acesso.
-        </p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Meu Perfil</h2>
+          <p class="text-sm text-slate-600">
+            Gerencie suas informações de acesso.
+          </p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 max-w-xl">
@@ -826,11 +1010,20 @@
 
     <!-- ASSINATURA -->
     <section id="billing" class="p-4 sm:p-6 lg:p-8 hidden-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">Assinatura</h2>
-        <p class="text-sm text-slate-600">
-          Veja o status do seu período de teste e do plano Pro.
-        </p>
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Assinatura</h2>
+          <p class="text-sm text-slate-600">
+            Veja o status do seu período de teste e do plano Pro.
+          </p>
+        </div>
+        <button
+          type="button"
+          onclick="goBackToDashboard()"
+          class="inline-flex items-center text-xs sm:text-sm text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-2xl"
+        >
+          <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao painel
+        </button>
       </div>
 
       <div class="max-w-2xl space-y-6">
@@ -880,6 +1073,24 @@
       </div>
     </section>
   </main>
+
+  <!-- Funções globais -->
+  <script>
+    function goBackToDashboard() {
+      const el = document.querySelector('[data-section="dashboard"]');
+      if (el) el.click();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 🔹 FUNÇÃO PARA MOBILE: abre a seção "Meu Perfil" via botão de engrenagem no header
+    function openProfileFromMobile() {
+      const profileMenuItem = document.querySelector('[data-section="profile"]');
+      if (profileMenuItem) {
+        profileMenuItem.click();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  </script>
 
   <script src="./js/nexoraai-panel.js"></script>
 </body>

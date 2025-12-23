@@ -15,7 +15,7 @@ body {
   color: white;
 }
 .sidebar-item.active {
-  background-color: rgba(59,130,246,0.16);
+  background-color: rgba(59, 130, 246, 0.16);
   color: white;
   border-right: 3px solid #3b82f6;
 }
@@ -25,7 +25,7 @@ body {
 }
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(15,23,42,0.08);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
 }
 
 .hidden-section {
@@ -37,9 +37,9 @@ body {
   width: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100,116,139,.35);
+  background: rgba(100, 116, 139, .35);
   border-radius: 999px;
-  border: 2px solid rgba(0,0,0,0);
+  border: 2px solid rgba(0, 0, 0, 0);
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-track {
@@ -47,12 +47,12 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid rgba(59,130,246,0.35);
+  outline: 3px solid rgba(59, 130, 246, 0.35);
   outline-offset: 2px;
   border-radius: 10px;
 }
 
-/* Botão de tipo de conteúdo */
+/* Botões tipo de conteúdo */
 .content-type-btn.active {
   background: #dbeafe;
   border-color: #3b82f6;
@@ -67,7 +67,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 400px;
 }
 .preview-img {
   width: 100%;
@@ -77,7 +77,7 @@ body {
   max-height: 650px;
 }
 
-/* FIX – card de ideia automática não estica com o flex */
+/* Fix para o card de sugestão automática */
 #autoIdeaBox {
   height: 300px;
   min-height: 300px;
