@@ -17,7 +17,7 @@
     "openai": "^4.20.1"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "keywords": [],
   "author": "",
