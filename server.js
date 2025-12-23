@@ -9,6 +9,7 @@ import OpenAI from "openai";
 import multer from "multer";
 import { createClient } from "@supabase/supabase-js";
 import os from "os";
+import mercadopago from "mercadopago";
 
 const app = express();
 
@@ -86,7 +87,7 @@ const oauthStateStore = new Set();
 // =====================================================
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
   console.warn(
-    "⚠️ AVISO: Variáveis do Supabase não configuradas. Login não funcionará."
+    "⚠️ AVISO: Variáveis do Supabase não configuradas. Login/planos podem não funcionar."
   );
 }
 
@@ -99,6 +100,108 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_URL || "https://placeholder.supabase.co",
   process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder"
 );
+
+// =====================================================
+//  MERCADO PAGO
+// =====================================================
+if (!process.env.MP_ACCESS_TOKEN) {
+  console.warn("⚠️ MP_ACCESS_TOKEN não configurado. Checkout não funcionará.");
+} else {
+  mercadopago.configure({
+    access_token: process.env.MP_ACCESS_TOKEN,
+  });
+}
+
+// =====================================================
+//  PLANS HELPERS (TRIAL + PRO)
+// =====================================================
+const TRIAL_DAYS_DEFAULT = 5; // período de teste padrão
+
+async function getOrCreatePlanForUser(userId) {
+  const { data: plan, error } = await supabaseAdmin
+    .from("plans")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Erro ao buscar plano:", error);
+    throw error;
+  }
+
+  if (plan) return plan;
+
+  // se não tiver plano, cria trial de 5 dias
+  const now = new Date();
+
+  const { data: inserted, error: insertError } = await supabaseAdmin
+    .from("plans")
+    .insert({
+      user_id: userId,
+      status: "trial",
+      trial_days: TRIAL_DAYS_DEFAULT,
+      trial_started_at: now.toISOString(),
+    })
+    .select("*")
+    .single();
+
+  if (insertError) {
+    console.error("Erro ao criar trial:", insertError);
+    throw insertError;
+  }
+
+  return inserted;
+}
+
+function computePlanStatus(planRow) {
+  const now = new Date();
+
+  // PRO
+  if (planRow.status === "pro" && planRow.plan_started_at && planRow.plan_ends_at) {
+    const start = new Date(planRow.plan_started_at);
+    const end = new Date(planRow.plan_ends_at);
+    const remainingMs = end - now;
+    const remainingDays = Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
+    const active = remainingMs > 0;
+
+    return {
+      mode: active ? "pro" : "expired",
+      status: active ? "pro" : "expired",
+      daysLeft: remainingDays,
+      planType: planRow.plan_type || null,
+      planStart: start,
+      planEnd: end,
+    };
+  }
+
+  // TRIAL
+  if (planRow.trial_started_at && planRow.trial_days) {
+    const start = new Date(planRow.trial_started_at);
+    const total = planRow.trial_days;
+    const diffMs = now - start;
+    const usedDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    const remaining = Math.max(0, total - usedDays);
+    const active = remaining > 0;
+
+    return {
+      mode: active ? "trial" : "expired",
+      status: active ? "trial" : "expired",
+      daysLeft: remaining,
+      trialTotal: total,
+      trialUsed: Math.min(total, usedDays),
+      trialStart: start,
+    };
+  }
+
+  // fallback
+  return {
+    mode: "none",
+    status: "none",
+    daysLeft: 0,
+  };
+}
 
 // =====================================================
 //  AUTH MIDDLEWARE
@@ -163,6 +266,9 @@ app.get("/", (req, res) =>
 app.get("/app", (req, res) =>
   res.sendFile(path.join(process.cwd(), "public", "painel.html"))
 );
+app.get("/checkout", (req, res) =>
+  res.sendFile(path.join(process.cwd(), "public", "checkout.html"))
+);
 app.get("/health", (req, res) =>
   res.json({ ok: true, status: "online", env: process.env.NODE_ENV })
 );
@@ -191,11 +297,12 @@ app.post("/auth/register", async (req, res) => {
       .from("profiles")
       .upsert({ id: data.user.id, full_name: name, phone });
 
+    // cria trial de 5 dias
     await supabaseAdmin.from("plans").insert({
       user_id: data.user.id,
       status: "trial",
-      trial_days: 7,
-      trial_started_at: new Date(),
+      trial_days: TRIAL_DAYS_DEFAULT,
+      trial_started_at: new Date().toISOString(),
     });
 
     await supabaseAdmin
@@ -239,31 +346,165 @@ app.post("/auth/login", async (req, res) => {
 });
 
 app.get("/auth/plan", getUserFromToken, async (req, res) => {
-  const { data: plan } = await supabaseAdmin
-    .from("plans")
-    .select("*")
-    .eq("user_id", req.user.id)
-    .maybeSingle();
+  try {
+    const userId = req.user.id;
 
-  const { data: profile } = await supabaseAdmin
-    .from("profiles")
-    .select("full_name")
-    .eq("id", req.user.id)
-    .single();
+    const planRow = await getOrCreatePlanForUser(userId);
+    const computed = computePlanStatus(planRow);
 
-  let status = plan?.status || "none";
-  let daysLeft = 7;
+    // se estiver expirado, marca na tabela
+    if (computed.status === "expired" && planRow.status !== "expired") {
+      await supabaseAdmin
+        .from("plans")
+        .update({ status: "expired" })
+        .eq("id", planRow.id);
+    }
 
-  return res.json({
-    ok: true,
-    plan: { status, daysLeft },
-    user: { id: req.user.id, email: req.user.email, name: profile?.full_name },
-  });
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .single();
+
+    return res.json({
+      ok: true,
+      plan: {
+        status: computed.status, // 'trial' | 'pro' | 'expired' | 'none'
+        mode: computed.mode,
+        daysLeft: computed.daysLeft,
+        trial: computed.trialTotal
+          ? {
+              total: computed.trialTotal,
+              used: computed.trialUsed,
+            }
+          : null,
+        pro: computed.planType
+          ? {
+              type: computed.planType,
+              start: computed.planStart,
+              end: computed.planEnd,
+            }
+          : null,
+      },
+      user: {
+        id: userId,
+        email: req.user.email,
+        name: profile?.full_name || req.user.email,
+      },
+    });
+  } catch (err) {
+    console.error("Erro em /auth/plan:", err);
+    return res
+      .status(500)
+      .json({ ok: false, error: "Erro ao carregar status do plano." });
+  }
+});
+
+// =====================================================
+//  CHECKOUT / MERCADO PAGO
+// =====================================================
+app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
+  try {
+    const { planType } = req.body; // 'quinzenal' | 'mensal'
+
+    let title, price, days;
+    if (planType === "mensal") {
+      title = "NexoraAI Pro - Plano Mensal";
+      price = 68;
+      days = 30;
+    } else {
+      // default: quinzenal
+      title = "NexoraAI Pro - Plano Quinzenal";
+      price = 37;
+      days = 15;
+    }
+
+    const APP_URL = process.env.APP_URL || "http://localhost:3001";
+
+    const preference = {
+      items: [
+        {
+          title,
+          quantity: 1,
+          currency_id: "BRL",
+          unit_price: Number(price),
+        },
+      ],
+      back_urls: {
+        success: `${APP_URL}/app?payment=success`,
+        failure: `${APP_URL}/app?payment=failure`,
+        pending: `${APP_URL}/app?payment=pending`,
+      },
+      auto_return: "approved",
+      notification_url: `${APP_URL}/api/checkout/webhook`,
+      metadata: {
+        userId: req.user.id,
+        planType,
+        days,
+      },
+    };
+
+    const result = await mercadopago.preferences.create(preference);
+
+    return res.json({
+      ok: true,
+      preferenceId: result.body.id,
+    });
+  } catch (err) {
+    console.error("Erro em /api/checkout/preference:", err);
+    res.status(500).json({ ok: false, error: "Falha ao criar pagamento." });
+  }
+});
+
+// Webhook do Mercado Pago
+app.post("/api/checkout/webhook", async (req, res) => {
+  try {
+    const body = req.body;
+
+    const type = body.type;
+    const data = body.data || {};
+
+    if (type !== "payment" || !data.id) {
+      return res.sendStatus(200);
+    }
+
+    const payment = await mercadopago.payment.findById(data.id);
+
+    if (payment.body.status !== "approved") {
+      return res.sendStatus(200);
+    }
+
+    const metadata = payment.body.metadata || {};
+    const userId = metadata.userId;
+    const planType = metadata.planType || "quinzenal";
+    const days = metadata.days || (planType === "mensal" ? 30 : 15);
+
+    if (!userId) {
+      console.warn("Webhook sem userId nos metadados.");
+      return res.sendStatus(200);
+    }
+
+    const start = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + days);
+
+    await supabaseAdmin.from("plans").insert({
+      user_id: userId,
+      status: "pro",
+      plan_type: planType,
+      plan_started_at: start.toISOString(),
+      plan_ends_at: end.toISOString(),
+    });
+
+    return res.sendStatus(200);
+  } catch (err) {
+    console.error("Erro no webhook Mercado Pago:", err);
+    res.sendStatus(500);
+  }
 });
 
 // =====================================================
 //  IA – GERAÇÃO DE POST COMPLETO (TEXTO + IMAGEM)
-//  -> Usa 5 campos: marca, tipo, objetivo, briefing, styleJson
 // =====================================================
 app.post(
   "/api/generate-post",
@@ -273,8 +514,15 @@ app.post(
       // -----------------------------
       // 1. DADOS VINDOS DO FRONT
       // -----------------------------
-      let { brand, objective, briefing, contentType, platform, styleJson, recreateMode } =
-        req.body;
+      let {
+        brand,
+        objective,
+        briefing,
+        contentType,
+        platform,
+        styleJson,
+        recreateMode,
+      } = req.body;
 
       if (typeof brand === "string") {
         brand = JSON.parse(brand || "{}");

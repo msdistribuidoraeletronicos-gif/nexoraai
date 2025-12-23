@@ -8,9 +8,6 @@ if (!localStorage.getItem("nexoraai_token")) {
 // URL do backend (como está rodando tudo no mesmo domínio/porta, pode ficar vazio)
 const API_BASE_URL = "";
 
-// URL de checkout (pode trocar depois)
-window.NEXORAAI_BILLING_URL = window.NEXORAAI_BILLING_URL || "";
-
 // ==========================================================
 //  HELPERS GERAIS
 // ==========================================================
@@ -371,16 +368,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 🔹 AGORA APENAS REDIRECIONA PARA /checkout
   if (btnBillingCheckout) {
     btnBillingCheckout.addEventListener("click", () => {
-      if (window.NEXORAAI_BILLING_URL) {
-        window.location.href = window.NEXORAAI_BILLING_URL;
-      } else {
-        toast(
-          "Defina window.NEXORAAI_BILLING_URL com a URL da sua página de pagamento.",
-          "info"
-        );
-      }
+      window.location.href = "/checkout";
     });
   }
 });

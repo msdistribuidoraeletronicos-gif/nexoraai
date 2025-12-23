@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexoraAI - Checkout</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- SDK Mercado Pago -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+  <style>
+    :root {
+      --accent: #f97316;
+      --accent-strong: #ea580c;
+      --bg-page: #0f172a;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #1d4ed8 0%, transparent 55%),
+        radial-gradient(1000px 700px at 90% 0%, #7c3aed 0%, transparent 50%),
+        linear-gradient(to bottom, #020617, #020617);
+      color: #e5e7eb;
+    }
+
+    h1,h2,h3 {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      letter-spacing: -0.03em;
+    }
+
+    .card {
+      border-radius: 1.3rem;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: radial-gradient(circle at top left, #0b1220, #020617);
+      box-shadow: 0 22px 45px rgba(15, 23, 42, 0.65);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.8);
+      border-color: rgba(129, 140, 248, 0.7);
+    }
+
+    .plan-card {
+      cursor: pointer;
+      position: relative;
+    }
+    .plan-card input {
+      display: none;
+    }
+    .plan-card-selected {
+      border-color: #22c55e;
+      box-shadow: 0 28px 60px rgba(16, 185, 129, 0.45);
+    }
+
+    .plan-badge {
+      border-radius: 999px;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.8rem 1.8rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 20px 45px rgba(234, 88, 12, 0.55);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-accent:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 26px 60px rgba(234, 88, 12, 0.7);
+    }
+    .btn-accent:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 14px 30px rgba(234, 88, 12, 0.8);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.6);
+      font-size: 0.8rem;
+      padding: 0.45rem 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #e5e7eb;
+    }
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .summary-chip {
+      border-radius: 999px;
+      padding: 0.15rem 0.65rem;
+      font-size: 0.7rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.65);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="min-h-screen flex flex-col">
+    <!-- HEADER -->
+    <header class="w-full border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+        <button
+          type="button"
+          onclick="window.location.href = '/app';"
+          class="flex items-center gap-3 focus:outline-none"
+        >
+          <div class="w-10 h-10 rounded-2xl bg-indigo-600/20 flex items-center justify-center border border-indigo-400/30">
+            <i class="fa-solid fa-layer-group text-indigo-300 text-lg"></i>
+          </div>
+          <div class="text-left">
+            <p class="text-xs text-slate-400">Painel de Conteúdo</p>
+            <h1 class="text-sm sm:text-base font-bold text-white leading-tight">NexoraAI</h1>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onclick="window.location.href = '/app';"
+          class="btn-ghost"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+          Voltar para o painel
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="flex-1">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div class="mb-8">
+          <p class="text-xs uppercase tracking-[0.15em] text-indigo-300 mb-2">
+            Assinatura NexoraAI Pro
+          </p>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mb-3">
+            Escolha o plano e conclua seu acesso.
+          </h2>
+          <p class="text-sm sm:text-base text-slate-300 max-w-2xl">
+            Você terá acesso a todas as funções do NexoraAI. Assim que o pagamento for aprovado,
+            o período do plano começa a contar automaticamente.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)] gap-6 lg:gap-8 items-start">
+          <!-- PLANOS -->
+          <section class="space-y-4">
+            <div class="card p-5 sm:p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-white">Escolha seu plano</h3>
+                <span class="plan-badge flex items-center gap-1 text-indigo-200">
+                  <i class="fa-solid fa-shield-halved text-xs"></i>
+                  Pagamento seguro via Mercado Pago
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Plano Quinzenal -->
+                <label class="plan-card card border border-slate-700/80 bg-slate-950/60 p-4 flex flex-col gap-2">
+                  <input type="radio" name="plan" value="quinzenal" checked>
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-sm font-semibold text-white">Plano Quinzenal</span>
+                    <span class="summary-chip bg-emerald-500/10 border-emerald-400/50 text-emerald-300">
+                      15 dias
+                    </span>
+                  </div>
+                  <p class="text-2xl font-bold text-white">
+                    R$ 37,00
+                  </p>
+                  <p class="text-xs text-slate-400">
+                    Ideal para testar a ferramenta por duas semanas com todos os recursos liberados.
+                  </p>
+                  <p class="hint mt-1">
+                    Ao pagar, seu acesso fica ativo por <strong>15 dias</strong> a partir da aprovação.
+                  </p>
+                </label>
+
+                <!-- Plano Mensal -->
+                <label class="plan-card card border border-slate-700/80 bg-slate-950/60 p-4 flex flex-col gap-2">
+                  <input type="radio" name="plan" value="mensal">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-sm font-semibold text-white">Plano Mensal</span>
+                    <span class="summary-chip bg-indigo-500/10 border-indigo-400/50 text-indigo-200">
+                      30 dias
+                    </span>
+                  </div>
+                  <p class="text-2xl font-bold text-white">
+                    R$ 68,00
+                  </p>
+                  <p class="text-xs text-slate-400">
+                    Perfeito para quem já decidiu usar o NexoraAI como parceiro de conteúdo no dia a dia.
+                  </p>
+                  <p class="hint mt-1">
+                    Ao pagar, seu acesso fica ativo por <strong>30 dias</strong> a partir da aprovação.
+                  </p>
+                </label>
+              </div>
+
+              <p class="mt-4 text-xs text-slate-400 flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-indigo-300"></i>
+                Você pode alterar ou renovar seu plano sempre que quiser, basta voltar a esta página.
+              </p>
+            </div>
+          </section>
+
+          <!-- RESUMO / AÇÃO -->
+          <aside class="card p-5 sm:p-6 space-y-5">
+            <div>
+              <p class="text-xs uppercase tracking-[0.18em] text-indigo-300 mb-2">
+                Resumo
+              </p>
+              <h3 class="text-xl font-semibold text-white mb-1">Detalhes da assinatura</h3>
+              <p class="text-xs text-slate-400">
+                Confirme o plano e finalize o pagamento via Mercado Pago.
+              </p>
+            </div>
+
+            <div class="space-y-3 text-sm">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-300">Plano selecionado</span>
+                <span id="summaryPlanName" class="font-semibold text-white">
+                  Plano Quinzenal
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="text-slate-300">Período de acesso</span>
+                <span id="summaryPlanPeriod" class="text-slate-100">
+                  15 dias
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="text-slate-300">Valor</span>
+                <span id="summaryPlanPrice" class="text-lg font-bold text-white">
+                  R$ 37,00
+                </span>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-800 pt-4 space-y-3">
+              <button id="btnCheckout" class="w-full btn-accent justify-center">
+                <i class="fa-solid fa-lock"></i>
+                Pagar com Mercado Pago
+              </button>
+
+              <p id="checkoutMessage" class="hint text-center mt-1">
+                Você será redirecionado para o ambiente seguro do Mercado Pago.
+              </p>
+            </div>
+
+            <div class="border-t border-slate-800 pt-3">
+              <p class="hint">
+                Assim que o pagamento for <strong>aprovado</strong>, o NexoraAI registra o início do seu plano
+                e libera o painel automaticamente. Se tiver qualquer problema, entre em contato com o suporte.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 👉 Substitua pela sua Public Key do Mercado Pago
+    const MP_PUBLIC_KEY = "SUA_PUBLIC_KEY_MERCADO_PAGO_AQUI"; 
+
+    const mp = new MercadoPago(MP_PUBLIC_KEY, {
+      locale: 'pt-BR'
+    });
+
+    const planCards = document.querySelectorAll('.plan-card');
+    const summaryPlanName   = document.getElementById('summaryPlanName');
+    const summaryPlanPeriod = document.getElementById('summaryPlanPeriod');
+    const summaryPlanPrice  = document.getElementById('summaryPlanPrice');
+    const btnCheckout       = document.getElementById('btnCheckout');
+    const checkoutMessage   = document.getElementById('checkoutMessage');
+
+    function updateSummaryFromSelection() {
+      const selected = document.querySelector('.plan-card input:checked');
+      if (!selected) return;
+
+      const value = selected.value; // quinzenal | mensal
+
+      if (value === 'quinzenal') {
+        summaryPlanName.textContent   = 'Plano Quinzenal';
+        summaryPlanPeriod.textContent = '15 dias';
+        summaryPlanPrice.textContent  = 'R$ 37,00';
+      } else {
+        summaryPlanName.textContent   = 'Plano Mensal';
+        summaryPlanPeriod.textContent = '30 dias';
+        summaryPlanPrice.textContent  = 'R$ 68,00';
+      }
+
+      planCards.forEach(card => {
+        if (card.querySelector('input').checked) {
+          card.classList.add('plan-card-selected');
+        } else {
+          card.classList.remove('plan-card-selected');
+        }
+      });
+    }
+
+    planCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const input = card.querySelector('input');
+        input.checked = true;
+        updateSummaryFromSelection();
+      });
+    });
+
+    updateSummaryFromSelection();
+
+    // Pega token de login salvo no localStorage para usar na rota protegida
+    function getAuthToken() {
+      try {
+        const raw = localStorage.getItem("nexora_session");
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        return obj.token || null;
+      } catch {
+        return null;
+      }
+    }
+
+    // 👉 Chama seu backend para criar a preference do Mercado Pago
+    btnCheckout.addEventListener('click', async () => {
+      const selected = document.querySelector('.plan-card input:checked');
+      if (!selected) return;
+
+      const planType = selected.value; // quinzenal | mensal
+
+      checkoutMessage.textContent = "Criando pagamento no Mercado Pago...";
+      btnCheckout.disabled = true;
+
+      try {
+        const token = getAuthToken();
+        if (!token) {
+          checkoutMessage.textContent = "Faça login no painel antes de assinar o plano.";
+          btnCheckout.disabled = false;
+          return;
+        }
+
+        const res = await fetch('/api/checkout/preference', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ planType })
+        });
+
+        if (!res.ok) {
+          throw new Error('Erro ao criar preferência de pagamento');
+        }
+
+        const data = await res.json(); // { preferenceId }
+        if (!data || !data.preferenceId) {
+          throw new Error('Resposta inválida do servidor');
+        }
+
+        checkoutMessage.textContent = "Redirecionando para o Mercado Pago...";
+        
+        mp.checkout({
+          preference: {
+            id: data.preferenceId
+          },
+          autoOpen: true,
+        });
+
+      } catch (err) {
+        console.error(err);
+        checkoutMessage.textContent = "Não foi possível criar o pagamento. Tente novamente ou fale com o suporte.";
+        btnCheckout.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
