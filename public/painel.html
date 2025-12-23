@@ -63,13 +63,21 @@
     .sidebar-item > span i {
       font-size: 1.1rem;
     }
+    /* Forçar que a sidebar NUNCA apareça em telas menores que 1024px */
+@media (max-width: 1023.98px) {
+  .sidebar-desktop-only {
+    display: none !important;
+  }
+}
+
   </style>
 </head>
 
 <body class="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-900">
 
   <!-- SIDEBAR – visível apenas em telas grandes -->
-  <aside class="hidden lg:flex lg:w-72 bg-slate-950 text-slate-300 flex-col relative z-50 flex-shrink-0">
+  <aside class="hidden lg:flex lg:w-72 bg-slate-950 text-slate-300 flex-col relative z-50 flex-shrink-0 sidebar-desktop-only">
+
     <div class="p-4 sm:p-6 border-b border-slate-800/70">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-indigo-600/20 flex items-center justify-center border border-indigo-500/20">
