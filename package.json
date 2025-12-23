@@ -1,0 +1,25 @@
+{
+  "name": "stratai",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.89.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.104.0",
+    "puppeteer-core": "^24.34.0"
+  },
+  "version": "1.0.0",
+  "main": "server.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

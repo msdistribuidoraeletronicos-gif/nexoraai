@@ -1,0 +1,2468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StratAI - Painel de Conteúdo</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #e0f2fe 0%, transparent 55%),
+        radial-gradient(1000px 700px at 90% 0%, #eef2ff 0%, transparent 50%),
+        #f6f7fb;
+    }
+    .sidebar-item { transition: all 0.25s ease; cursor: pointer; }
+    .sidebar-item:hover { background-color: rgba(148,163,184,0.10); color: white; }
+    .sidebar-item.active {
+      background-color: rgba(59,130,246,0.16);
+      color: white;
+      border-right: 3px solid #3b82f6;
+    }
+    .card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,23,42,0.08); }
+    .hidden-section { display: none; }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100,116,139,.35);
+      border-radius: 999px;
+      border: 2px solid rgba(0,0,0,0);
+      background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-track { background: transparent; }
+    :focus-visible {
+      outline: 3px solid rgba(59,130,246,0.35);
+      outline-offset: 2px;
+      border-radius: 10px;
+    }
+    .content-type-btn.active {
+      background: #dbeafe;
+      border-color: #3b82f6;
+    }
+
+    /* Preview visual (igual ao seu template antigo) */
+    .preview-container {
+      width: 100%;
+      background-color: #0f172a;
+      border-radius: 1rem;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+    }
+    .preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      max-height: 650px;
+    }
+  </style>
+</head>
+
+<body class="flex h-screen overflow-hidden text-slate-900">
+
+  <!-- SIDEBAR -->
+  <aside class="w-72 bg-slate-950 text-slate-300 flex flex-col relative z-50">
+    <div class="p-6 border-b border-slate-800/70">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-blue-600/15 flex items-center justify-center border border-blue-500/20">
+          <i class="fa-solid fa-brain text-blue-400"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white leading-tight">StratAI</h1>
+          <p class="text-xs text-slate-400">Conteúdo estratégico com IA</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="flex-1 mt-4 px-3 overflow-y-auto">
+      <p class="px-3 pb-2 text-[11px] uppercase tracking-wider text-slate-500">Navegação</p>
+
+      <ul class="space-y-1">
+        <li data-section="dashboard" class="sidebar-item active px-4 py-3 rounded-xl flex items-center gap-3">
+          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+            <i class="fa-solid fa-chart-pie text-slate-200"></i>
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Dashboard</p>
+            <p class="text-xs text-slate-400">Visão geral</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+        </li>
+
+        <li data-section="create" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
+          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+            <i class="fa-solid fa-pen-nib text-slate-200"></i>
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Criar Conteúdo</p>
+            <p class="text-xs text-slate-400">Geração guiada</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+        </li>
+
+        <li data-section="brands" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
+          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+            <i class="fa-solid fa-briefcase text-slate-200"></i>
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Minhas Marcas</p>
+            <p class="text-xs text-slate-400">Projetos e clientes</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+        </li>
+
+        <li data-section="templates" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
+          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+            <i class="fa-regular fa-image text-slate-200"></i>
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Templates (Flyer)</p>
+            <p class="text-xs text-slate-400">Gerar por @arroba</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+        </li>
+
+        <li data-section="history" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
+          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+            <i class="fa-solid fa-clock-rotate-left text-slate-200"></i>
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Histórico</p>
+            <p class="text-xs text-slate-400">Gerações passadas</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Rodapé da Sidebar com perfil -->
+    <div class="p-4 border-t border-slate-800/70 relative">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold shadow-sm">
+          U
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-white leading-tight" data-user-name>Usuário</p>
+          <p id="planLabel" class="text-xs text-slate-400">Plano Pro</p>
+        </div>
+        <button
+          id="userSettingsBtn"
+          class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer"
+          title="Configurações"
+          type="button"
+        >
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
+        <span>API:</span>
+        <span id="apiStatus" class="px-2 py-1 rounded-full bg-white/5 border border-white/10">checando...</span>
+      </div>
+
+      <!-- Painel de Perfil do Usuário -->
+      <div
+        id="userProfilePanel"
+        class="hidden absolute left-4 right-4 bottom-20 bg-slate-900/95 border border-slate-700 rounded-2xl p-4 shadow-2xl text-slate-100 z-50 backdrop-blur-sm"
+      >
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold shadow-sm">
+            U
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-semibold leading-tight" data-user-name>Usuário</p>
+            <p id="planLabelProfile" class="text-[11px] text-slate-400">Plano Pro</p>
+          </div>
+        </div>
+
+        <div class="space-y-2 text-sm">
+          <button
+            type="button"
+            id="btnProfile"
+            class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-left transition-colors"
+          >
+            <i class="fa-regular fa-user text-slate-300 w-5"></i>
+            <span>Meu perfil</span>
+          </button>
+
+          <button
+            type="button"
+            id="btnBilling"
+            class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-left transition-colors"
+          >
+            <i class="fa-regular fa-credit-card text-slate-300 w-5"></i>
+            <span>Assinatura</span>
+          </button>
+
+          <div class="h-px bg-slate-700/50 my-1"></div>
+
+          <button
+            type="button"
+            id="btnLogout"
+            class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-900/30 text-red-300 hover:text-red-200 text-left transition-colors"
+          >
+            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+            <span>Sair da conta</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 flex flex-col overflow-y-auto relative">
+    <header class="sticky top-0 z-20 backdrop-blur bg-white/55 border-b border-slate-200/70">
+      <div class="px-8 py-4 flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs text-slate-500">Bem-vindo de volta</p>
+          <h2 class="text-lg font-bold text-slate-800">Painel de Conteúdo</h2>
+        </div>
+        <button onclick="showSection('create-mode')" class="bg-slate-900 text-white px-4 py-2 rounded-2xl shadow-sm hover:bg-slate-800 text-sm font-semibold">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Criar
+        </button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="p-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Painel Central</h2>
+          <p class="text-sm text-slate-600">Resumo de performance e próximos passos.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between">
+            <p class="text-slate-500 text-sm">Conteúdos este mês</p>
+            <span class="w-10 h-10 rounded-2xl bg-blue-600/10 border border-blue-500/15 flex items-center justify-center">
+              <i class="fa-solid fa-bolt text-blue-600"></i>
+            </span>
+          </div>
+          <p id="statContentsMonth" class="mt-3 text-3xl font-bold text-slate-900">0</p>
+          <p class="text-xs text-slate-500 mt-1">Baseado no uso deste navegador</p>
+        </div>
+
+        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between">
+            <p class="text-slate-500 text-sm">Marcas ativas</p>
+            <span class="w-10 h-10 rounded-2xl bg-emerald-600/10 border border-emerald-500/15 flex items-center justify-center">
+              <i class="fa-solid fa-briefcase text-emerald-600"></i>
+            </span>
+          </div>
+          <p id="statBrands" class="mt-3 text-3xl font-bold text-slate-900">0</p>
+          <p class="text-xs text-slate-500 mt-1">Cadastradas</p>
+        </div>
+
+        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between">
+            <p class="text-slate-500 text-sm">Gerações feitas</p>
+            <span class="w-10 h-10 rounded-2xl bg-indigo-600/10 border border-indigo-500/15 flex items-center justify-center">
+              <i class="fa-solid fa-microchip text-indigo-600"></i>
+            </span>
+          </div>
+          <p id="statGenerations" class="mt-3 text-3xl font-bold text-slate-900">0</p>
+          <p class="text-xs text-slate-500 mt-1">Total</p>
+        </div>
+
+        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between">
+            <p class="text-slate-500 text-sm">Último conteúdo</p>
+            <span class="w-10 h-10 rounded-2xl bg-purple-600/10 border border-purple-500/15 flex items-center justify-center">
+              <i class="fa-solid fa-chart-line text-purple-600"></i>
+            </span>
+          </div>
+          <p id="statLastType" class="mt-3 text-lg font-bold text-slate-900">—</p>
+          <p id="statLastBrand" class="text-xs text-slate-500 mt-1">—</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800">Últimos conteúdos gerados</h3>
+          </div>
+          <ul id="recentList" class="space-y-3">
+            <li class="text-sm text-slate-500">Nenhum conteúdo gerado ainda.</li>
+          </ul>
+        </div>
+        <div class="p-6 rounded-2xl shadow-sm border border-slate-200 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+          <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-xl"></div>
+          <h3 class="font-bold mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Sugestão da IA
+          </h3>
+          <p class="text-sm opacity-90 mb-5 leading-relaxed">
+            Post de bastidores + prova social + CTA simples costuma performar bem em negócios locais.
+          </p>
+          <button onclick="showSection('create-mode')" class="bg-white text-blue-700 px-4 py-2 rounded-2xl text-sm font-bold shadow hover:bg-slate-100">
+            Criar agora
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MINHAS MARCAS -->
+    <section id="brands" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Minhas Marcas / Projetos</h2>
+        <p class="text-sm text-slate-600">Cadastre cada marca para evitar conteúdo genérico.</p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between gap-4 border-b pb-4 mb-5">
+            <h3 class="text-lg font-semibold text-slate-900">
+              <span class="text-blue-600">Cadastrar</span> nova marca
+            </h3>
+            <span class="text-xs text-slate-500 bg-slate-50 border border-slate-200 px-3 py-1 rounded-full">
+              Configuração estratégica
+            </span>
+          </div>
+
+          <form id="brandForm" class="space-y-4" onsubmit="return false;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700">Nome da Marca</label>
+                <input id="brandName" type="text" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-blue-500" placeholder="Ex: Restaurante Marineis">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700">Nicho / Segmento</label>
+                <input id="brandNiche" type="text" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-blue-500" placeholder="Ex: Restaurante, Loja de Roupas, Clínica de Estética...">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Público-alvo</label>
+              <textarea id="brandAudience" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-blue-500" rows="3" placeholder="Ex: Famílias da região, classe média..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700">Tom de Voz</label>
+                <select id="brandTone" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-blue-500">
+                  <option>Profissional</option>
+                  <option>Informal</option>
+                  <option>Autoridade</option>
+                  <option>Humanizado</option>
+                  <option>Persuasivo</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700">Objetivo Principal</label>
+                <select id="brandGoal" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-blue-500">
+                  <option>Vender</option>
+                  <option>Gerar Autoridade</option>
+                  <option>Engajar</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="button" onclick="saveBrand()" class="w-full bg-slate-900 text-white p-3 rounded-2xl hover:bg-slate-800 font-semibold mt-4 shadow-sm">
+              <i class="fa-solid fa-check"></i> Salvar Marca
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800">Marcas cadastradas</h3>
+            <button type="button" onclick="clearBrands()" class="text-xs px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100">
+              <i class="fa-solid fa-trash"></i> Limpar tudo
+            </button>
+          </div>
+          <ul id="brandList" class="space-y-3">
+            <li class="text-sm text-slate-500">Nenhuma marca cadastrada ainda.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEMPLATES (FLYER POR ARROBA) -->
+    <section id="templates" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Flyer por arroba do Instagram</h2>
+        <p class="text-sm text-slate-600">
+          Digite o arroba do perfil e a IA vai gerar um flyer relacionado ao conteúdo desse perfil.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <label class="block text-sm font-bold text-slate-800 mb-2">Arroba do Instagram</label>
+          <div class="flex gap-3">
+            <div class="flex-1 relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">@</span>
+              <input id="igHandleInput" type="text" class="pl-7 pr-3 py-3 w-full border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-blue-500" placeholder="seuperfil">
+            </div>
+            <button type="button" onclick="generateFlyerFromHandle()" class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold hover:bg-blue-700">
+              Enter
+            </button>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            Pode digitar <strong>seuperfil</strong> ou <strong>@seuperfil</strong>, os dois funcionam.
+          </p>
+          <p id="igHandleStatus" class="text-xs text-slate-500 mt-2"></p>
+        </div>
+
+        <div id="templatesResult" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
+          <div class="text-slate-400">
+            <div class="w-14 h-14 rounded-3xl bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto mb-4">
+              <i class="fa-solid fa-image text-xl"></i>
+            </div>
+            <p class="font-semibold text-slate-600">Nenhuma imagem gerada ainda.</p>
+            <p class="text-sm text-slate-500 mt-1">Informe um arroba e clique em Enter.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section id="history" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Histórico</h2>
+        <p class="text-sm text-slate-600">Veja e recarregue conteúdos gerados anteriormente.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-slate-800">Gerações</h3>
+          <button type="button" onclick="clearHistory()" class="text-xs px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100">
+            <i class="fa-solid fa-trash"></i> Limpar histórico
+          </button>
+        </div>
+        <ul id="historyList" class="space-y-3">
+          <li class="text-sm text-slate-500">Nenhum conteúdo ainda.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ESCOLHA: COMERCIAL OU PESSOAL -->
+    <section id="create-mode" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo</h2>
+        <p class="text-sm text-slate-600">Escolha se o conteúdo será para uso comercial (empresas, marcas) ou pessoal.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+        <button type="button" onclick="openCreateCommercial()" class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-left hover:border-blue-500/60">
+          <div class="flex items-center gap-4 mb-3">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center">
+              <i class="fa-solid fa-briefcase text-blue-600 text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Comercial</h3>
+              <p class="text-sm text-slate-600">Para empresas, marcas, clientes, negócios locais, etc.</p>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500">
+            Usa a página de criação atual, com marca, objetivos, briefing e geração completa de post.
+          </p>
+        </button>
+
+        <button type="button" onclick="openCreatePersonal()" class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-left hover:border-purple-500/60">
+          <div class="flex items-center gap-4 mb-3">
+            <div class="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center">
+              <i class="fa-solid fa-user text-purple-600 text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Pessoal</h3>
+              <p class="text-sm text-slate-600">Para posts pessoais, hobbies, fotos próprias, desabafos, etc.</p>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500">
+            Vai abrir uma nova página de criação pessoal.
+          </p>
+        </button>
+      </div>
+    </section>
+
+    <!-- CRIAÇÃO PESSOAL -->
+    <section id="create-personal" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo pessoal</h2>
+        <p class="text-sm text-slate-600">
+          Escolha o tipo de arte pessoal, defina o objetivo e o que você quer comunicar. A IA entrega arte + legenda.
+        </p>
+      </div>
+
+      <div class="flex flex-col xl:flex-row gap-8">
+        <div class="w-full xl:w-1/2 space-y-6">
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <label class="block text-sm font-bold text-slate-800 mb-2">1. Tipo de conteúdo pessoal</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <select id="personalTypeSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-blue-500">
+                <option value="">Selecione o tipo de conteúdo...</option>
+                <option>Flyer de aniversário infantil</option>
+                <option>Flyer de aniversário adulto</option>
+                <option>Convite de aniversário simples</option>
+                <option>Convite de casamento</option>
+                <option>Convite de chá revelação</option>
+                <option>Convite de chá de bebê</option>
+                <option>Convite de formatura</option>
+                <option>Convite de noivado</option>
+                <option>Convite de confraternização em família</option>
+                <option>Convite para culto / celebração religiosa</option>
+                <option>Banner de aniversário</option>
+                <option>Banner de formatura</option>
+                <option>Banner de evento familiar</option>
+                <option>Cartão de visita pessoal</option>
+                <option>Cartão de agradecimento</option>
+                <option>Cartão de felicitações</option>
+                <option>Cartão de Natal</option>
+                <option>Cartão de Ano Novo</option>
+                <option>Cartão do Dia das Mães</option>
+                <option>Cartão do Dia dos Pais</option>
+                <option>Post pessoal para Instagram</option>
+                <option>Post de selfie com frase</option>
+                <option>Post de reflexão</option>
+                <option>Post de fé / mensagem bíblica</option>
+                <option>Post de relacionamento (casal)</option>
+                <option>Post de viagem</option>
+                <option>Post de conquista pessoal</option>
+                <option>Story de aniversário</option>
+                <option>Story de contagem regressiva</option>
+                <option>Story para divulgação de evento pessoal</option>
+                <option>Capa para destaques do Instagram</option>
+                <option>Capa para Reels</option>
+                <option>Capa para vídeo do TikTok</option>
+                <option>Thumbnail para canal pessoal no YouTube</option>
+                <option>Wallpaper para celular</option>
+                <option>Wallpaper para computador</option>
+                <option>Logo pessoal (assinatura)</option>
+                <option>Logo para canal no YouTube</option>
+                <option>Logo para projeto pessoal</option>
+                <option>Certificado simbólico</option>
+                <option>Lembrancinha digital</option>
+                <option>Tag para lembrancinha</option>
+                <option>Convite digital para WhatsApp</option>
+                <option>Save the date</option>
+                <option>Layout de currículo</option>
+                <option>Cartão digital de contato</option>
+                <option>Capa para Facebook pessoal</option>
+                <option>Capa para LinkedIn pessoal</option>
+                <option>Banner para status do WhatsApp</option>
+                <option>Flyer para bazar / desapegos</option>
+              </select>
+              <input id="personalTypeCustom" type="text" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-blue-500" placeholder="Ou escreva aqui o tipo de conteúdo desejado">
+            </div>
+            <p id="personalTypeHint" class="text-xs text-slate-500 mt-2">
+              Se não encontrar na lista, escreva no campo ao lado.
+            </p>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2">2. Objetivo</label>
+              <select id="personalObjectiveSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-blue-500">
+                <option>Compartilhar momento</option>
+                <option>Convidar pessoas</option>
+                <option>Agradecer</option>
+                <option>Homenagear alguém</option>
+                <option>Motivar / inspirar</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <label class="block text-sm font-bold text-slate-800 mb-2">3. Briefing: O que comunicar?</label>
+            <textarea id="personalBriefingInput" class="w-full border border-slate-300 rounded-2xl p-4 bg-white shadow-sm focus:border-blue-500" rows="5" placeholder="Ex: Convite de aniversário de 15 anos da Marilidia, tema vermelho com dourado, data, horário e local."></textarea>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <label class="block text-sm font-bold text-slate-800 mb-2">4. Imagens de Referência (Opcional)</label>
+            <div class="p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-center hover:bg-slate-100 transition cursor-pointer relative group">
+              <input type="file" id="personalReferenceImages" name="personalReferenceImages" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+              <div class="pointer-events-none group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 mb-2"></i>
+                <p class="text-sm text-slate-600 font-medium">Clique ou arraste até 3 imagens pessoais</p>
+                <p class="text-xs text-slate-400 mt-1">Fotos, referências de cores, prints de ideias...</p>
+              </div>
+            </div>
+            <p id="personalFileStatus" class="text-xs text-blue-600 font-medium mt-2 text-center"></p>
+
+            <div class="mt-4 flex items-start gap-3 p-3 bg-purple-50 rounded-xl border border-purple-100">
+              <div class="flex h-6 items-center">
+                <input id="personalRecreateCheck" type="checkbox" class="h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-600">
+              </div>
+              <div class="text-sm">
+                <label for="personalRecreateCheck" class="font-medium text-purple-900 cursor-pointer">Usar imagem como base (Recriar)</label>
+                <p class="text-slate-600 text-xs">
+                  A IA vai tentar copiar o cenário, composição e elementos da foto enviada, apenas melhorando a qualidade.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" onclick="generatePersonalPost()" class="w-full bg-purple-600 text-white p-4 rounded-2xl hover:bg-purple-700 font-bold mt-2 shadow-sm transition transform hover:-translate-y-0.5">
+            🌟 Gerar Conteúdo Pessoal
+          </button>
+
+          <p class="text-xs text-slate-500 mt-3">
+            Dica: explique quem é a pessoa, o tipo de evento e o clima que você quer (romântico, divertido, formal...).
+          </p>
+        </div>
+
+        <div class="w-full xl:w-1/2">
+          <div id="personalResultArea" class="bg-white h-full p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center">
+            <div class="text-slate-400">
+              <div class="w-14 h-14 rounded-3xl bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-heart text-2xl"></i>
+              </div>
+              <p class="font-semibold text-slate-600">Aguardando briefing pessoal…</p>
+              <p class="text-sm text-slate-500 mt-1">
+                Preencha os dados e clique em <strong>Gerar Conteúdo Pessoal</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div id="personalFinalContent" class="hidden bg-white h-full p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
+              <h3 class="font-bold text-slate-800">Resultado gerado (pessoal)</h3>
+              <div class="flex gap-2">
+                <button type="button" onclick="copyCaptionPersonal()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
+                  <i class="fa-solid fa-copy"></i> Copiar legenda
+                </button>
+                <button type="button" onclick="downloadImagePersonal()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
+                  <i class="fa-solid fa-download"></i> Baixar imagem
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+              <div class="preview-container">
+                <img id="personalPreviewImage" alt="Imagem pessoal gerada" class="preview-img" />
+              </div>
+
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                <p class="text-xs text-slate-500 mb-2"><i class="fa-solid fa-hashtag"></i> Legenda + Hashtags (se houver)</p>
+                <pre id="personalCaptionOutput" class="whitespace-pre-wrap text-sm leading-relaxed text-slate-800"></pre>
+
+                <div class="flex flex-wrap gap-2 mt-4 border-t border-slate-200 pt-3">
+                  <button type="button" onclick="variantPersonal('short')" class="text-xs border border-purple-200 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-50 transition">
+                    🔄 Mais Curto
+                  </button>
+                  <button type="button" onclick="variantPersonal('formal')" class="text-xs border border-purple-200 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-50 transition">
+                    👔 Mais Formal
+                  </button>
+                  <button type="button" onclick="variantPersonal('persuasive')" class="text-xs border border-purple-200 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-50 transition">
+                    🔥 Mais Persuasivo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CRIAÇÃO COMERCIAL -->
+    <section id="create" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Criar novo conteúdo (Comercial)</h2>
+        <p class="text-sm text-slate-600">
+          Defina marca, formato e briefing. A IA entrega post completo com visual + legenda.
+        </p>
+      </div>
+
+      <div class="flex flex-col xl:flex-row gap-8">
+        <div class="w-full xl:w-1/2 space-y-6">
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <label class="block text-sm font-bold text-slate-800 mb-2">1. Selecione a Marca</label>
+            <select id="createBrandSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-blue-500"></select>
+            <p id="brandHint" class="text-xs text-slate-500 mt-2">Cadastre uma marca para personalizar.</p>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2">2. Tipo de Conteúdo</label>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="instagram">
+                  <i class="fa-brands fa-instagram"></i> Post Instagram
+                </button>
+                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="facebook">
+                  <i class="fa-brands fa-facebook"></i> Post Facebook
+                </button>
+                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="site">
+                  <i class="fa-solid fa-globe"></i> Para Site
+                </button>
+                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="video">
+                  <i class="fa-solid fa-video"></i> Roteiro Vídeo
+                </button>
+                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="copy">
+                  <i class="fa-solid fa-bullseye"></i> Copy Vendas
+                </button>
+              </div>
+              <p id="typeHint" class="text-xs text-slate-500 mt-2">Selecione um tipo para continuar.</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2">3. Objetivo</label>
+              <select id="objectiveSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-blue-500">
+                <option>Vender</option>
+                <option>Engajar</option>
+                <option>Educar</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <label class="block text-sm font-bold text-slate-800 mb-2">3. Briefing: O que comunicar?</label>
+            <textarea id="briefingInput" class="w-full border border-slate-300 rounded-2xl p-4 bg-white shadow-sm focus:border-blue-500" rows="5" placeholder="Ex: Divulgar promoção de final de semana, explicar o benefício principal, destacar um diferencial, etc."></textarea>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <label class="block text-sm font-bold text-slate-800 mb-2">4. Perfil, página ou site de referência (opcional)</label>
+            <input id="referenceProfileInput" type="text" class="w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-blue-500" placeholder="Cole aqui o link do perfil, página ou site (ex: https://minhamarca.com)">
+            <p class="text-xs text-slate-500 mt-2">
+              Se quiser, informe um perfil, página ou site para a IA considerar como referência de conteúdo/estilo.
+            </p>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <label class="block text-sm font-bold text-slate-800 mb-2">5. Imagens de Referência (Opcional)</label>
+            <div class="p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-center hover:bg-slate-100 transition cursor-pointer relative group">
+              <input type="file" id="referenceImages" name="referenceImages" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+              <div class="pointer-events-none group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 mb-2"></i>
+                <p class="text-sm text-slate-600 font-medium">Clique ou arraste até 3 imagens</p>
+                <p class="text-xs text-slate-400 mt-1">Logo, posts antigos, identidade visual...</p>
+              </div>
+            </div>
+            <p id="fileStatus" class="text-xs text-blue-600 font-medium mt-2 text-center"></p>
+
+            <div class="mt-4 flex items-start gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+              <div class="flex h-6 items-center">
+                <input id="recreateCheck" type="checkbox" class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-600">
+              </div>
+              <div class="text-sm">
+                <label for="recreateCheck" class="font-medium text-blue-900 cursor-pointer">Usar imagem como base (Recriar)</label>
+                <p class="text-slate-600 text-xs">
+                  Mantém a mesma cena e objetos da foto, útil para melhorar fotos de produtos ou pratos.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" onclick="generatePostComplete()" class="w-full bg-blue-600 text-white p-4 rounded-2xl hover:bg-blue-700 font-bold mt-2 shadow-sm transition transform hover:-translate-y-0.5">
+            ✨ Gerar Conteúdo Estratégico
+          </button>
+
+          <p class="text-xs text-slate-500 mt-3">
+            Dica: inclua <strong>preço</strong>, <strong>prazo</strong>, <strong>condição</strong> e <strong>CTA</strong>.
+          </p>
+        </div>
+
+        <div class="w-full xl:w-1/2">
+          <div id="resultArea" class="bg-white h-full p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center">
+            <div class="text-slate-400">
+              <div class="w-14 h-14 rounded-3xl bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-robot text-2xl"></i>
+              </div>
+              <p class="font-semibold text-slate-600">Aguardando briefing…</p>
+              <p class="text-sm text-slate-500 mt-1">Preencha os dados e clique em <strong>Gerar</strong>.</p>
+            </div>
+          </div>
+
+          <div id="finalContent" class="hidden bg-white h-full p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
+              <h3 class="font-bold text-slate-800">Resultado gerado</h3>
+              <div class="flex gap-2">
+                <button type="button" onclick="copyCaption()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
+                  <i class="fa-solid fa-copy"></i> Copiar legenda
+                </button>
+                <button type="button" onclick="downloadImage()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
+                  <i class="fa-solid fa-download"></i> Baixar imagem
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+              <div class="preview-container">
+                <img id="previewImage" alt="Imagem do post" class="preview-img" />
+              </div>
+
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                <p class="text-xs text-slate-500 mb-2"><i class="fa-solid fa-hashtag"></i> Legenda + Hashtags</p>
+                <pre id="captionOutput" class="whitespace-pre-wrap text-sm leading-relaxed text-slate-800"></pre>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="variant('short')" class="text-xs border border-blue-200 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-50">
+                  🔄 Mais Curto
+                </button>
+                <button type="button" onclick="variant('formal')" class="text-xs border border-blue-200 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-50">
+                  👔 Mais Formal
+                </button>
+                <button type="button" onclick="variant('persuasive')" class="text-xs border border-blue-200 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-50">
+                  🔥 Mais Persuasivo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERFIL -->
+    <section id="profile" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Meu perfil</h2>
+        <p class="text-sm text-slate-600">
+          Gerencie como seu nome aparece no painel.
+        </p>
+      </div>
+
+      <div class="max-w-xl bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            Nome exibido
+          </label>
+          <input
+            id="profileNameInput"
+            type="text"
+            class="w-full rounded-2xl border border-slate-300 bg-white px-3 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            placeholder="Seu nome"
+          />
+          <p class="text-[11px] text-slate-500 mt-1">
+            Este é o nome que aparece na lateral esquerda e nos menus internos.
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-slate-700 mb-1">
+            E-mail de acesso
+          </p>
+          <p id="profileEmailValue" class="text-sm text-slate-500">—</p>
+          <p class="text-[11px] text-slate-400 mt-1">
+            Por enquanto o e-mail de login só pode ser alterado pelo suporte.
+          </p>
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-slate-700 mb-1">
+            Plano atual
+          </p>
+          <span
+            id="profilePlanBadge"
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-slate-100 text-slate-700"
+          >
+            —
+          </span>
+        </div>
+
+        <button
+          type="button"
+          id="btnProfileSave"
+          class="mt-2 inline-flex items-center justify-center rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:ring-offset-slate-100 transition"
+        >
+          Salvar alterações
+        </button>
+      </div>
+    </section>
+
+    <!-- ASSINATURA / PLANO -->
+    <section id="billing" class="p-8 hidden-section">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">Assinatura</h2>
+        <p class="text-sm text-slate-600">
+          Veja o status do seu período de teste e do plano Pro.
+        </p>
+      </div>
+
+      <div class="max-w-2xl space-y-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-sm font-medium text-slate-800">Plano atual</p>
+              <p id="billingPlanInfo" class="text-sm text-slate-500 mt-1">
+                Carregando informações do plano...
+              </p>
+            </div>
+            <span
+              id="billingPlanBadge"
+              class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-slate-100 text-slate-700"
+            >
+              —
+            </span>
+          </div>
+
+          <button
+            type="button"
+            id="btnBillingRefresh"
+            class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:ring-offset-slate-100 transition w-max"
+          >
+            Atualizar status
+          </button>
+        </div>
+
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-6 rounded-2xl shadow-sm border border-slate-200/0">
+          <h3 class="font-semibold mb-2">StratAI Pro – R$ 49,90/mês</h3>
+          <ul class="text-sm space-y-1 opacity-95 mb-4">
+            <li>• Geração ilimitada dentro do uso justo</li>
+            <li>• Salvar marcas e histórico de conteúdos</li>
+            <li>• Prioridade nas filas de geração</li>
+          </ul>
+          <button
+            type="button"
+            id="btnBillingCheckout"
+            class="inline-flex items-center justify-center rounded-2xl bg-white/95 text-blue-700 px-4 py-2.5 text-sm font-semibold hover:bg-white transition"
+          >
+            Assinar / Gerenciar plano
+          </button>
+          <p class="mt-2 text-[11px] text-white/80">
+            Ao clicar, você será redirecionado para a página de pagamento configurada.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ==========================================================
+    //  AUTENTICAÇÃO BÁSICA (token do Supabase)
+    // ==========================================================
+    if (!localStorage.getItem("stratai_token")) {
+      window.location.href = "/";
+    }
+
+    // URL do backend (como está rodando tudo no mesmo domínio/porta, pode ficar vazio)
+    const API_BASE_URL = "";
+
+    // URL de checkout (pode trocar depois)
+    window.STRATAI_BILLING_URL = window.STRATAI_BILLING_URL || "";
+
+    // ==========================================================
+    //  HELPERS GERAIS
+    // ==========================================================
+    function $(id) { return document.getElementById(id); }
+
+    function safeJSONParse(val, fb) {
+      try { return JSON.parse(val) ?? fb; } catch { return fb; }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function nowISO() { return new Date().toISOString(); }
+
+    function formatDateTimeBR(iso) {
+      return new Date(iso).toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short",
+      });
+    }
+
+    function monthKey(d = new Date()) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      return `${y}-${m}`;
+    }
+
+    function toast(msg, type = "info") {
+      const d = document.createElement("div");
+      d.className =
+        "fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl shadow-lg border text-sm " +
+        (type === "error"
+          ? "bg-red-50 border-red-200 text-red-800"
+          : type === "success"
+          ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+          : "bg-slate-50 border-slate-200 text-slate-800");
+      d.innerHTML = `<span>${escapeHtml(msg)}</span>`;
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 2600);
+    }
+
+    // ==========================================================
+    //  STORAGE POR USUÁRIO (brands e generations)
+    // ==========================================================
+    function currentUserId() {
+      return localStorage.getItem("stratai_user_id") || "anon";
+    }
+
+    function brandsKey() {
+      return `stratai_${currentUserId()}_brands_v2`;
+    }
+
+    function generationsKey() {
+      return `stratai_${currentUserId()}_generations_v2`;
+    }
+
+    function getBrands() {
+      return safeJSONParse(localStorage.getItem(brandsKey()), []);
+    }
+
+    function setBrands(b) {
+      localStorage.setItem(brandsKey(), JSON.stringify(b));
+    }
+
+    function getGenerations() {
+      return safeJSONParse(localStorage.getItem(generationsKey()), []);
+    }
+
+    function setGenerations(items) {
+      // limita a 20 últimos e remove imagem dos mais antigos p/ não lotar localStorage
+      let trimmed = items.slice(0, 20).map((g, idx) => {
+        if (idx === 0) return g;
+        const clone = { ...g };
+        delete clone.imageUrl;
+        return clone;
+      });
+
+      try {
+        localStorage.setItem(generationsKey(), JSON.stringify(trimmed));
+      } catch (e) {
+        console.warn("Histórico grande demais, tentando reduzir", e);
+        try {
+          const minimal = trimmed.slice(0, 5).map((g) => {
+            const c = { ...g };
+            delete c.imageUrl;
+            return c;
+          });
+          localStorage.setItem(generationsKey(), JSON.stringify(minimal));
+        } catch (e2) {
+          console.error("Falha ao salvar histórico, limpando", e2);
+          localStorage.removeItem(generationsKey());
+        }
+      }
+    }
+
+    // ==========================================================
+    //  PERFIL + PLANO (Supabase)
+    // ==========================================================
+    function syncUserName() {
+      const name = localStorage.getItem("stratai_user_name") || "Usuário";
+      document.querySelectorAll("[data-user-name]").forEach((el) => {
+        el.textContent = name;
+      });
+    }
+
+    function syncPlanBadgesFromLocal() {
+      const raw = localStorage.getItem("stratai_plan");
+      const labelSidebar = document.getElementById("planLabel");
+      const labelProfileSmall = document.getElementById("planLabelProfile");
+      const badgeProfile = document.getElementById("profilePlanBadge");
+      const badgeBilling = document.getElementById("billingPlanBadge");
+      const infoBilling = document.getElementById("billingPlanInfo");
+
+      if (labelSidebar && labelProfileSmall) {
+        labelProfileSmall.textContent = labelSidebar.textContent;
+      }
+
+      if (!raw) {
+        if (badgeProfile) badgeProfile.textContent = "Pro R$ 49,90/mês";
+        if (badgeBilling) badgeBilling.textContent = "Pro";
+        if (infoBilling)
+          infoBilling.textContent =
+            "Não encontramos informações do plano ainda. Clique em “Atualizar status” para buscar no servidor.";
+        return;
+      }
+
+      try {
+        const plan = JSON.parse(raw);
+        let short = "Pro";
+
+        if (plan.status === "trial") {
+          short = "Teste";
+          if (infoBilling)
+            infoBilling.textContent = `Você está em período de teste (${plan.daysLeft} dia(s) restantes). Depois disso, o plano vira Pro por R$ 49,90/mês.`;
+        } else if (plan.status === "expired") {
+          short = "Expirado";
+          if (infoBilling)
+            infoBilling.textContent =
+              "Seu período de teste acabou. Renove para continuar usando a plataforma.";
+        } else {
+          if (infoBilling)
+            infoBilling.textContent =
+              "Seu plano Pro está ativo. Obrigado por apoiar o projeto! 🎉";
+        }
+
+        if (badgeProfile) badgeProfile.textContent = short;
+        if (badgeBilling) badgeBilling.textContent = short;
+      } catch (e) {
+        console.error("Erro ao ler plano:", e);
+      }
+    }
+
+    function updatePlanLabel(plan) {
+      const el = document.getElementById("planLabel");
+      if (!el) return;
+
+      if (!plan) {
+        el.textContent = "Pro R$ 49,90/mês";
+        el.className = "text-xs text-slate-400";
+        return;
+      }
+
+      if (plan.status === "trial") {
+        el.textContent = `Teste (${plan.daysLeft} dia(s) restantes) · Pro R$ 49,90/mês`;
+        el.className = "text-xs text-blue-500 font-medium";
+      } else if (plan.status === "expired") {
+        el.textContent = "Plano expirado · Renove agora";
+        el.className = "text-xs text-red-500 font-bold";
+      } else {
+        el.textContent = "Pro R$ 49,90/mês";
+        el.className = "text-xs text-slate-400";
+      }
+
+      syncPlanBadgesFromLocal();
+    }
+
+    function checkPlanOnLoad() {
+      const raw = localStorage.getItem("stratai_plan");
+      if (!raw) return;
+      try {
+        const plan = JSON.parse(raw);
+        if (plan.status === "expired") {
+          toast("Seu período de teste acabou. Assine o plano Pro para continuar.", "error");
+          openBillingSection();
+        }
+      } catch (e) {
+        console.error("Erro ao verificar plano:", e);
+      }
+    }
+
+    function fetchPlanStatus() {
+      const token = localStorage.getItem("stratai_token");
+      if (!token) return;
+
+      const baseUrl = API_BASE_URL || "";
+      fetch(`${baseUrl}/auth/plan`, {
+        method: "GET",
+        headers: { Authorization: "Bearer " + token },
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (!data.ok) return;
+          const plan = data.plan;
+          localStorage.setItem("stratai_plan", JSON.stringify(plan || {}));
+          if (data.user && data.user.email) {
+            localStorage.setItem("stratai_user_email", data.user.email);
+          }
+          updatePlanLabel(plan);
+          checkPlanOnLoad();
+        })
+        .catch((err) => {
+          console.error("Erro ao buscar plano:", err);
+        });
+    }
+
+    function checkPlanBeforeGenerate() {
+      const raw = localStorage.getItem("stratai_plan");
+      if (!raw) return true; // se não soubermos, deixa gerar
+
+      try {
+        const plan = JSON.parse(raw);
+        if (plan.status === "expired") {
+          toast("Seu período de teste acabou. Assine o plano Pro para continuar.", "error");
+          openBillingSection();
+          return false;
+        }
+        return true;
+      } catch {
+        return true;
+      }
+    }
+
+    function logoutStratAI() {
+      try {
+        localStorage.removeItem("stratai_token");
+        localStorage.removeItem("stratai_user_id");
+        localStorage.removeItem("stratai_user_name");
+        localStorage.removeItem("stratai_user_email");
+        localStorage.removeItem("stratai_plan");
+        localStorage.removeItem(brandsKey());
+        localStorage.removeItem(generationsKey());
+      } catch (e) {
+        console.error("Erro ao limpar storage:", e);
+      }
+      window.location.href = "/";
+    }
+
+    function openProfileSection() {
+      const name = localStorage.getItem("stratai_user_name") || "Usuário";
+      const email = localStorage.getItem("stratai_user_email") || "—";
+      const input = $("profileNameInput");
+      const emailEl = $("profileEmailValue");
+      if (input) input.value = name;
+      if (emailEl) emailEl.textContent = email;
+      syncPlanBadgesFromLocal();
+      showSection("profile");
+    }
+
+    function openBillingSection() {
+      syncPlanBadgesFromLocal();
+      showSection("billing");
+    }
+
+    // ==========================================================
+    //  CONFIGURAÇÃO INICIAL DE PERFIL / BOTÕES
+    // ==========================================================
+    document.addEventListener("DOMContentLoaded", () => {
+      syncUserName();
+
+      const gearBtn = document.getElementById("userSettingsBtn");
+      const profilePanel = document.getElementById("userProfilePanel");
+      const btnLogout = document.getElementById("btnLogout");
+      const planLabel = document.getElementById("planLabel");
+      const planLabelProfile = document.getElementById("planLabelProfile");
+      const btnProfile = document.getElementById("btnProfile");
+      const btnBilling = document.getElementById("btnBilling");
+      const btnProfileSave = document.getElementById("btnProfileSave");
+      const btnBillingRefresh = document.getElementById("btnBillingRefresh");
+      const btnBillingCheckout = document.getElementById("btnBillingCheckout");
+
+      if (planLabel && planLabelProfile) {
+        planLabelProfile.textContent = planLabel.textContent;
+      }
+
+      if (gearBtn && profilePanel) {
+        gearBtn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          profilePanel.classList.toggle("hidden");
+        });
+
+        document.addEventListener("click", (ev) => {
+          if (
+            !profilePanel.classList.contains("hidden") &&
+            !profilePanel.contains(ev.target) &&
+            !gearBtn.contains(ev.target)
+          ) {
+            profilePanel.classList.add("hidden");
+          }
+        });
+      }
+
+      if (btnLogout) btnLogout.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        logoutStratAI();
+      });
+
+      if (btnProfile) btnProfile.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        if (profilePanel) profilePanel.classList.add("hidden");
+        openProfileSection();
+      });
+
+      if (btnBilling) btnBilling.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        if (profilePanel) profilePanel.classList.add("hidden");
+        openBillingSection();
+      });
+
+      if (btnProfileSave) {
+        btnProfileSave.addEventListener("click", () => {
+          const input = document.getElementById("profileNameInput");
+          if (!input) return;
+          const newName = input.value.trim() || "Usuário";
+          localStorage.setItem("stratai_user_name", newName);
+          syncUserName();
+          toast("Nome atualizado na interface.", "success");
+        });
+      }
+
+      if (btnBillingRefresh) {
+        btnBillingRefresh.addEventListener("click", () => {
+          fetchPlanStatus();
+          setTimeout(syncPlanBadgesFromLocal, 500);
+        });
+      }
+
+      if (btnBillingCheckout) {
+        btnBillingCheckout.addEventListener("click", () => {
+          if (window.STRATAI_BILLING_URL) {
+            window.location.href = window.STRATAI_BILLING_URL;
+          } else {
+            toast(
+              "Defina window.STRATAI_BILLING_URL com a URL da sua página de pagamento.",
+              "info"
+            );
+          }
+        });
+      }
+    });
+
+    // ==========================================================
+    //  FILE INPUT STATUS
+    // ==========================================================
+    document.addEventListener("DOMContentLoaded", () => {
+      const setups = [
+        { inputId: "referenceImages", statusId: "fileStatus" },
+        { inputId: "personalReferenceImages", statusId: "personalFileStatus" },
+      ];
+
+      setups.forEach(({ inputId, statusId }) => {
+        const fileInput = $(inputId);
+        if (!fileInput) return;
+        fileInput.addEventListener("change", (e) => {
+          const count = e.target.files.length;
+          const status = $(statusId);
+          if (status) {
+            status.textContent =
+              count > 0 ? `${count} imagem(ns) selecionada(s)` : "";
+          }
+        });
+      });
+    });
+
+    // ==========================================================
+    //  NAVEGAÇÃO ENTRE SEÇÕES
+    // ==========================================================
+    let selectedContentType = null;
+    let currentGeneratedId = null;
+    let lastTemplateImageUrl = null;
+    let lastPersonalResult = null;
+
+    window.openCreateCommercial = function () {
+      showSection("create");
+      hydrateCreateBrandSelect();
+    };
+
+    window.openCreatePersonal = function () {
+      showSection("create-personal");
+    };
+
+    window.showSection = function (sectionId) {
+      const sections = [
+        "dashboard",
+        "brands",
+        "create-mode",
+        "create",
+        "create-personal",
+        "templates",
+        "history",
+        "profile",
+        "billing",
+      ];
+
+      sections.forEach((id) => {
+        const el = $(id);
+        if (!el) return;
+        if (id === sectionId) el.classList.remove("hidden-section");
+        else el.classList.add("hidden-section");
+      });
+
+      const navActiveKey =
+        sectionId === "create-mode" ||
+        sectionId === "create" ||
+        sectionId === "create-personal"
+          ? "create"
+          : sectionId;
+
+      document.querySelectorAll(".sidebar-item[data-section]").forEach((item) => {
+        const target = item.getAttribute("data-section");
+        item.classList.toggle("active", target === navActiveKey);
+      });
+
+      if (sectionId === "brands") renderBrands();
+      if (sectionId === "create") hydrateCreateBrandSelect();
+      if (sectionId === "history") renderHistory();
+      refreshDashboard();
+    };
+
+    function setupSidebarNavigation() {
+      document.querySelectorAll(".sidebar-item[data-section]").forEach((item) => {
+        item.addEventListener("click", () => {
+          const target = item.getAttribute("data-section") || "dashboard";
+          const sectionId = target === "create" ? "create-mode" : target;
+          showSection(sectionId);
+        });
+      });
+    }
+
+    // ==========================================================
+    //  API STATUS
+    // ==========================================================
+    async function checkAPI() {
+      const badge = $("apiStatus");
+      if (!badge) return;
+      try {
+        const r = await fetch(`${API_BASE_URL}/health`, { method: "GET" });
+        if (!r.ok) throw new Error("bad");
+        badge.textContent = "online";
+        badge.className =
+          "px-2 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-200";
+      } catch {
+        badge.textContent = "offline";
+        badge.className =
+          "px-2 py-1 rounded-full bg-red-500/15 border border-red-500/25 text-red-200";
+      }
+    }
+
+    // ==========================================================
+    //  SVG FALLBACK
+    // ==========================================================
+    function svgDataURI({ title, subtitle }) {
+      const safeT = (title || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeS = (subtitle || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2563eb"/>
+              <stop offset="1" stop-color="#4f46e5"/>
+            </linearGradient>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#0b1220" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+          <rect width="1080" height="1080" fill="url(#g)"/>
+          <circle cx="980" cy="120" r="220" fill="rgba(255,255,255,0.12)"/>
+          <circle cx="120" cy="980" r="260" fill="rgba(255,255,255,0.10)"/>
+          <rect x="90" y="220" width="900" height="640" rx="48" fill="rgba(255,255,255,0.14)" filter="url(#shadow)"/>
+          <text x="140" y="360" font-family="Inter, Arial" font-size="56" fill="#ffffff" font-weight="700">${safeT}</text>
+          <text x="140" y="430" font-family="Inter, Arial" font-size="30" fill="rgba(255,255,255,0.92)" font-weight="500">${safeS}</text>
+          <text x="140" y="800" font-family="Inter, Arial" font-size="26" fill="rgba(255,255,255,0.85)">Gerado pelo StratAI • Visual provisório</text>
+        </svg>
+      `.trim();
+
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    // ==========================================================
+    //  FLYER POR ARROBA
+    // ==========================================================
+    window.generateFlyerFromHandle = async function () {
+      if (!checkPlanBeforeGenerate()) return;
+
+      const input = $("igHandleInput");
+      const statusEl = $("igHandleStatus");
+      const resultBox = $("templatesResult");
+      if (!input) return;
+
+      const raw = (input.value || "").trim();
+      if (!raw) {
+        toast("Informe o arroba do Instagram.", "error");
+        input.focus();
+        return;
+      }
+      const cleanHandle = raw.replace(/^@+/, "");
+
+      if (statusEl)
+        statusEl.textContent = `Gerando flyer para @${cleanHandle}...`;
+
+      if (resultBox) {
+        resultBox.innerHTML = `
+          <div class="flex flex-col items-center text-center animate-pulse text-slate-500">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center mb-3">
+              <i class="fa-solid fa-circle-notch fa-spin text-blue-600"></i>
+            </div>
+            <p class="text-sm font-semibold">Gerando imagem a partir do perfil @${cleanHandle}…</p>
+          </div>
+        `;
+      }
+
+      try {
+        const r = await fetch(`${API_BASE_URL}/api/templates/ig-flyer`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ handle: cleanHandle }),
+        });
+        const data = await r.json();
+
+        if (!r.ok || !data?.ok) {
+          throw new Error(data?.error || "Erro ao gerar flyer.");
+        }
+        if (!data.imageUrl) {
+          throw new Error("Resposta sem imagem.");
+        }
+
+        lastTemplateImageUrl = data.imageUrl;
+
+        if (resultBox) {
+          resultBox.innerHTML = `
+            <div class="w-full flex flex-col gap-3">
+              <div class="rounded-2xl border border-slate-200 overflow-hidden bg-slate-50">
+                <img src="${data.imageUrl}" alt="Flyer gerado" class="w-full h-auto block rounded-2xl" />
+              </div>
+              <button type="button" onclick="downloadTemplateImage()" class="self-start text-xs px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100">
+                <i class="fa-solid fa-download"></i> Baixar imagem
+              </button>
+            </div>
+          `;
+        }
+        if (statusEl) statusEl.textContent = `Flyer gerado para @${cleanHandle}.`;
+        toast("Flyer gerado com sucesso!", "success");
+      } catch (e) {
+        console.error(e);
+        if (statusEl) statusEl.textContent = "Erro ao gerar flyer.";
+        if (resultBox) {
+          resultBox.innerHTML = `
+            <div class="text-center text-sm text-red-600">
+              Ocorreu um erro ao gerar a imagem.
+            </div>
+          `;
+        }
+        toast(e.message || "Erro ao gerar flyer.", "error");
+      }
+    };
+
+    window.downloadTemplateImage = function () {
+      if (!lastTemplateImageUrl) {
+        toast("Nenhuma imagem para baixar.", "error");
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = lastTemplateImageUrl;
+      a.download = `flyer_instagram_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+
+    // ==========================================================
+    //  MARCAS
+    // ==========================================================
+    function normalizeBrandPayload() {
+      const id =
+        (crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + Math.random();
+
+      return {
+        id,
+        name: ($("brandName")?.value || "").trim(),
+        niche: ($("brandNiche")?.value || "Negócio Local").trim(),
+        audience: ($("brandAudience")?.value || "").trim(),
+        tone: ($("brandTone")?.value || "Profissional").trim(),
+        goal: ($("brandGoal")?.value || "Vender").trim(),
+        createdAt: nowISO(),
+      };
+    }
+
+    window.saveBrand = function () {
+      const brand = normalizeBrandPayload();
+      if (!brand.name) {
+        toast("Preencha o nome da marca.", "error");
+        $("brandName")?.focus();
+        return;
+      }
+      const brands = getBrands();
+      brands.unshift(brand);
+      setBrands(brands);
+
+      if ($("brandName")) $("brandName").value = "";
+      if ($("brandNiche")) $("brandNiche").value = "";
+      if ($("brandAudience")) $("brandAudience").value = "";
+
+      renderBrands();
+      hydrateCreateBrandSelect();
+      refreshDashboard();
+      toast("Marca salva com sucesso!", "success");
+    };
+
+    window.clearBrands = function () {
+      if (!confirm("Tem certeza que deseja apagar todas as marcas?")) return;
+      setBrands([]);
+      renderBrands();
+      hydrateCreateBrandSelect();
+      refreshDashboard();
+      toast("Marcas removidas.", "success");
+    };
+
+    window.removeBrand = function (id) {
+      const brands = getBrands().filter((b) => b.id !== id);
+      setBrands(brands);
+      renderBrands();
+      hydrateCreateBrandSelect();
+      refreshDashboard();
+      toast("Marca removida.", "success");
+    };
+
+    function renderBrands() {
+      const list = $("brandList");
+      if (!list) return;
+      const brands = getBrands();
+      if (!brands.length) {
+        list.innerHTML =
+          '<li class="text-sm text-slate-500">Nenhuma marca cadastrada ainda.</li>';
+        return;
+      }
+
+      list.innerHTML = brands
+        .map(
+          (b) => `
+          <li class="border border-slate-200 rounded-2xl p-4 bg-slate-50/40">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="font-bold text-slate-900">${escapeHtml(b.name)}</p>
+                <p class="text-xs text-slate-600 mt-1">
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white border border-slate-200">
+                    <i class="fa-solid fa-tag text-slate-500"></i>
+                    ${escapeHtml(b.niche)}
+                  </span>
+                  <span class="ml-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white border border-slate-200">
+                    <i class="fa-solid fa-microphone text-slate-500"></i>
+                    ${escapeHtml(b.tone)}
+                  </span>
+                  <span class="ml-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white border border-slate-200">
+                    <i class="fa-solid fa-bullseye text-slate-500"></i>
+                    ${escapeHtml(b.goal)}
+                  </span>
+                </p>
+                <p class="text-xs text-slate-500 mt-2">
+                  <i class="fa-regular fa-clock"></i> ${formatDateTimeBR(b.createdAt)}
+                </p>
+                ${
+                  b.audience
+                    ? `<p class="text-sm text-slate-700 mt-3 leading-relaxed"><strong>Público:</strong> ${escapeHtml(
+                        b.audience
+                      )}</p>`
+                    : ""
+                }
+              </div>
+              <button class="text-xs px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700"
+                onclick="removeBrand('${b.id}')">
+                <i class="fa-solid fa-trash"></i> Remover
+              </button>
+            </div>
+          </li>
+        `
+        )
+        .join("");
+    }
+
+    function hydrateCreateBrandSelect() {
+      const sel = $("createBrandSelect");
+      const hint = $("brandHint");
+      if (!sel) return;
+      const brands = getBrands();
+
+      sel.innerHTML = "";
+      if (!brands.length) {
+        const opt = document.createElement("option");
+        opt.textContent = "Nenhuma marca cadastrada";
+        opt.value = "";
+        sel.appendChild(opt);
+        sel.disabled = true;
+        if (hint)
+          hint.textContent =
+            "Cadastre uma marca em “Minhas Marcas” para personalizar.";
+        return;
+      }
+
+      sel.disabled = false;
+      if (hint)
+        hint.textContent =
+          "Escolha uma marca para puxar tom e objetivo automaticamente (se quiser).";
+
+      const placeholder = document.createElement("option");
+      placeholder.textContent = "Selecione uma marca...";
+      placeholder.value = "";
+      sel.appendChild(placeholder);
+
+      brands.forEach((b) => {
+        const opt = document.createElement("option");
+        opt.value = b.id;
+        opt.textContent = `${b.name} • ${b.niche}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    // ==========================================================
+    //  TIPO DE CONTEÚDO (BOTÕES)
+    // ==========================================================
+    function setupContentTypeButtons() {
+      document.querySelectorAll(".content-type-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".content-type-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          selectedContentType = btn.dataset.content || null;
+          const hint = $("typeHint");
+          if (hint) {
+            hint.textContent = selectedContentType
+              ? `Tipo selecionado: ${labelContentType(selectedContentType)}`
+              : "Selecione um tipo para continuar.";
+          }
+        });
+      });
+    }
+
+    function labelContentType(type) {
+      const map = {
+        instagram: "Post Instagram",
+        facebook: "Post Facebook",
+        site: "Para Site",
+        video: "Roteiro Vídeo",
+        copy: "Copy Vendas",
+        personal: "Conteúdo Pessoal",
+      };
+      return map[type] || type;
+    }
+
+    function getSelectedBrand() {
+      const id = $("createBrandSelect")?.value;
+      if (!id) return null;
+      return getBrands().find((b) => b.id === id) || null;
+    }
+
+    // ==========================================================
+    //  FALLBACK DE CAPTION LOCAL
+    // ==========================================================
+    function buildLocalPost({ brand, objective, briefing, type }) {
+      const bName = brand?.name || "Sua marca";
+      const niche = brand?.niche || "negócio local";
+
+      const ctaByObj = {
+        Vender: "📲 Chame no WhatsApp e garanta o seu agora!",
+        Engajar: "💬 Comente aqui e marque alguém que precisa ver isso!",
+        Educar: "💾 Salve este post e compartilhe com alguém que vai se beneficiar!",
+      };
+
+      const cta = ctaByObj[objective] || "Fale com a gente.";
+
+      const hashtags = [
+        `#${bName.replace(/\s+/g, "")}`,
+        `#${niche.replace(/\s+/g, "")}`,
+        "#conteudoestrategico",
+        "#marketingdigital",
+        type === "instagram" ? "#instagrambrasil" : "",
+        type === "facebook" ? "#facebookmarketing" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      const caption = `🔥 ${bName}\n\n${briefing}\n\n✅ Feito especialmente para ${niche}.\n${cta}\n\n${hashtags}`;
+
+      const img = svgDataURI({
+        title:
+          objective === "Vender"
+            ? "Oferta em destaque"
+            : objective === "Educar"
+            ? "Dica prática"
+            : "Conteúdo do dia",
+        subtitle:
+          briefing.length > 60 ? briefing.slice(0, 60) + "…" : briefing,
+      });
+
+      return { caption, imageUrl: img };
+    }
+
+    function buildPersonalLocalPost({ personalType, objective, briefing }) {
+      const title =
+        objective === "Convidar pessoas"
+          ? "Você é meu convidado!"
+          : objective === "Agradecer"
+          ? "Muito obrigado(a)!"
+          : objective === "Homenagear alguém"
+          ? "Homenagem especial"
+          : "Momento especial";
+
+      const subtitle =
+        briefing.length > 60 ? briefing.slice(0, 60) + "…" : briefing || personalType;
+
+      const caption = `💜 ${personalType}\n\n${briefing}\n\nObjetivo: ${objective}.\nCompartilhe com quem faz parte desse momento.`;
+
+      const img = svgDataURI({ title, subtitle });
+      return { caption, imageUrl: img };
+    }
+
+    // ==========================================================
+    //  LOADING UI
+    // ==========================================================
+    function setLoadingUI(on) {
+      const resultArea = $("resultArea");
+      const finalContent = $("finalContent");
+      if (on) {
+        if (finalContent) finalContent.classList.add("hidden");
+        if (resultArea) {
+          resultArea.classList.remove("hidden");
+          resultArea.innerHTML = `
+            <div class="animate-pulse flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-3xl bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl text-blue-600"></i>
+              </div>
+              <p class="font-semibold text-slate-700">Gerando post completo…</p>
+              <p class="text-sm text-slate-500 mt-1">Legenda + hashtags + visual</p>
+            </div>
+          `;
+        }
+      } else {
+        if (resultArea) resultArea.classList.add("hidden");
+        if (finalContent) finalContent.classList.remove("hidden");
+      }
+    }
+
+    function setPersonalLoadingUI(on) {
+      const resultArea = $("personalResultArea");
+      const finalContent = $("personalFinalContent");
+      if (on) {
+        if (finalContent) finalContent.classList.add("hidden");
+        if (resultArea) {
+          resultArea.classList.remove("hidden");
+          resultArea.innerHTML = `
+            <div class="animate-pulse flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-3xl bg-purple-50 border border-purple-200 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl text-purple-600"></i>
+              </div>
+              <p class="font-semibold text-slate-700">Gerando arte pessoal…</p>
+              <p class="text-sm text-slate-500 mt-1">Legenda + visual personalizado</p>
+            </div>
+          `;
+        }
+      } else {
+        if (resultArea) resultArea.classList.add("hidden");
+        if (finalContent) finalContent.classList.remove("hidden");
+      }
+    }
+
+    // ==========================================================
+    //  GERAÇÃO PESSOAL
+    // ==========================================================
+    window.generatePersonalPost = async function () {
+      if (!checkPlanBeforeGenerate()) return;
+
+      const typeSelect = $("personalTypeSelect");
+      const objectiveSel = $("personalObjectiveSelect");
+      const briefingEl = $("personalBriefingInput");
+      const fileInput = $("personalReferenceImages");
+      const recreateCheck = $("personalRecreateCheck");
+
+      const custom = ($("personalTypeCustom")?.value || "").trim();
+      const personalType = custom || (typeSelect?.value || "").trim();
+      const objective = objectiveSel?.value || "Compartilhar momento";
+      const briefing = (briefingEl?.value || "").trim();
+
+      if (!personalType) {
+        toast("Selecione ou escreva o tipo de conteúdo pessoal.", "error");
+        typeSelect?.focus();
+        return;
+      }
+      if (!briefing) {
+        toast("Descreva o que você quer comunicar no briefing.", "error");
+        briefingEl?.focus();
+        return;
+      }
+
+      setPersonalLoadingUI(true);
+
+      const brand = {
+        name: `Pessoal - ${personalType}`,
+        niche: personalType,
+        audience: "Uso pessoal, amigos e familiares",
+        tone: "Humanizado",
+        goal: objective,
+      };
+
+      let result = null;
+
+      try {
+        const fd = new FormData();
+        fd.append("brand", JSON.stringify(brand));
+        fd.append("objective", objective);
+        fd.append("briefing", briefing);
+        fd.append("contentType", "personal");
+
+        if (recreateCheck && recreateCheck.checked) {
+          fd.append("recreateMode", "true");
+        }
+        if (fileInput && fileInput.files.length > 0) {
+          const max = Math.min(fileInput.files.length, 3);
+          for (let i = 0; i < max; i++) {
+            fd.append("referenceImages", fileInput.files[i]);
+          }
+        }
+
+        const r = await fetch(`${API_BASE_URL}/api/generate-post`, {
+          method: "POST",
+          body: fd,
+        });
+
+        if (r.ok) {
+          const payload = await r.json();
+          if (payload?.ok && payload.caption) {
+            const fallbackVisual = buildPersonalLocalPost({
+              personalType,
+              objective,
+              briefing,
+            });
+            result = {
+              caption: payload.caption,
+              imageUrl: payload.imageUrl || fallbackVisual.imageUrl,
+            };
+            if (!payload.imageUrl) {
+              toast(
+                "Imagem da IA falhou, gerando visual provisório (pessoal).",
+                "info"
+              );
+            }
+          } else if (payload && !payload.ok) {
+            toast(
+              "Erro no backend: " +
+                (payload.error || "Falha ao gerar conteúdo."),
+              "error"
+            );
+          }
+        }
+      } catch (e) {
+        console.warn("Erro backend (pessoal), usando fallback local.", e);
+      }
+
+      if (!result) {
+        result = buildPersonalLocalPost({ personalType, objective, briefing });
+        toast("Backend indisponível (pessoal). Usei fallback local.", "info");
+      }
+
+      lastPersonalResult = {
+        ...result,
+        personalType,
+        objective,
+        briefing,
+      };
+
+      const id =
+        (crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + Math.random();
+
+      const item = {
+        id,
+        createdAt: nowISO(),
+        brandId: null,
+        brandName: `Pessoal - ${personalType}`,
+        platform: "personal",
+        mode: "personal",
+        objective,
+        briefing,
+        caption: result.caption,
+        imageUrl: result.imageUrl,
+        personalType,
+      };
+
+      const items = getGenerations();
+      items.unshift(item);
+      setGenerations(items);
+
+      $("personalPreviewImage").src = result.imageUrl;
+      $("personalCaptionOutput").textContent = result.caption;
+      setPersonalLoadingUI(false);
+      refreshDashboard();
+      renderHistory();
+      toast("Conteúdo pessoal gerado!", "success");
+    };
+
+    window.copyCaptionPersonal = function () {
+      if (!lastPersonalResult) {
+        toast("Nada para copiar (pessoal).", "error");
+        return;
+      }
+      navigator.clipboard
+        .writeText(lastPersonalResult.caption)
+        .then(() => toast("Legenda pessoal copiada!", "success"))
+        .catch(() =>
+          toast("Falha ao copiar (permissão do navegador).", "error")
+        );
+    };
+
+    window.downloadImagePersonal = function () {
+      if (!lastPersonalResult) {
+        toast("Nenhuma imagem pessoal para baixar.", "error");
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = lastPersonalResult.imageUrl;
+      a.download = `stratai_pessoal_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast("Download iniciado!", "success");
+    };
+
+    window.variantPersonal = function (kind) {
+      if (!lastPersonalResult) {
+        toast("Nada para ajustar (pessoal).", "error");
+        return;
+      }
+      let caption = lastPersonalResult.caption || "";
+
+      if (kind === "short") {
+        const lines = caption.split("\n");
+        const main = lines.slice(0, 6).join("\n");
+        const hashtags = (caption.match(/#\S+/g) || []).slice(0, 6).join(" ");
+        caption = main + (hashtags ? "\n\n" + hashtags : "");
+      } else if (kind === "formal") {
+        caption = caption
+          .replace(/[🔥💜🎉🎊🥳💥🚀✨🎁🎈]/g, "")
+          .replace(/!/g, ".")
+          .replace(/✅/g, "•");
+      } else if (kind === "persuasive") {
+        caption =
+          "💥 " +
+          caption.replace(
+            "Objetivo:",
+            "Objetivo desse momento:"
+          ) +
+          "\n\n⚡ Não perca esse momento especial, compartilhe com quem você ama.";
+      }
+
+      lastPersonalResult.caption = caption;
+      $("personalCaptionOutput").textContent = caption;
+      toast("Variação aplicada (pessoal).", "success");
+    };
+
+    // ==========================================================
+    //  GERAÇÃO COMERCIAL
+    // ==========================================================
+    function getCurrentItem() {
+      if (!currentGeneratedId) return null;
+      return getGenerations().find((x) => x.id === currentGeneratedId) || null;
+    }
+
+    window.generatePostComplete = async function () {
+      if (!checkPlanBeforeGenerate()) return;
+
+      const brand = getSelectedBrand();
+      const objective = $("objectiveSelect")?.value || "Vender";
+      const briefing = ($("briefingInput")?.value || "").trim();
+      const referenceProfile = ($("referenceProfileInput")?.value || "").trim();
+      const type = selectedContentType;
+      const fileInput = $("referenceImages");
+      const recreateCheck = $("recreateCheck");
+
+      if (!brand) {
+        toast("Selecione uma marca.", "error");
+        $("createBrandSelect")?.focus();
+        return;
+      }
+      if (!type) {
+        toast("Selecione um tipo de conteúdo.", "error");
+        return;
+      }
+      if (!briefing) {
+        toast("Preencha o briefing.", "error");
+        $("briefingInput")?.focus();
+        return;
+      }
+
+      setLoadingUI(true);
+      let result = null;
+
+      try {
+        const fd = new FormData();
+        fd.append("brand", JSON.stringify(brand));
+        fd.append("objective", objective);
+        fd.append("briefing", briefing);
+        fd.append("contentType", type);
+        if (referenceProfile) fd.append("referenceProfile", referenceProfile);
+        if (recreateCheck && recreateCheck.checked) {
+          fd.append("recreateMode", "true");
+        }
+        if (fileInput && fileInput.files.length > 0) {
+          for (let i = 0; i < fileInput.files.length; i++) {
+            fd.append("referenceImages", fileInput.files[i]);
+          }
+        }
+
+        const r = await fetch(`${API_BASE_URL}/api/generate-post`, {
+          method: "POST",
+          body: fd,
+        });
+
+        if (r.ok) {
+          const payload = await r.json();
+          if (payload?.ok && payload.caption) {
+            const fallbackVisual = buildLocalPost({
+              brand,
+              objective,
+              briefing,
+              type,
+            });
+            result = {
+              caption: payload.caption,
+              imageUrl: payload.imageUrl || fallbackVisual.imageUrl,
+            };
+            if (!payload.imageUrl) {
+              toast("Imagem da IA falhou, gerando visual provisório.", "info");
+            }
+          } else if (payload && !payload.ok) {
+            toast(
+              "Erro no backend: " +
+                (payload.error || "Falha ao gerar conteúdo."),
+              "error"
+            );
+          }
+        }
+      } catch (e) {
+        console.warn("Erro backend (comercial), usando fallback local.", e);
+      }
+
+      if (!result) {
+        result = buildLocalPost({ brand, objective, briefing, type });
+        toast("Backend indisponível. Usei fallback local.", "info");
+      }
+
+      const id =
+        (crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : String(Date.now()) + Math.random();
+
+      const item = {
+        id,
+        createdAt: nowISO(),
+        brandId: brand.id,
+        brandName: brand.name,
+        platform: type,
+        objective,
+        briefing,
+        caption: result.caption,
+        imageUrl: result.imageUrl,
+      };
+
+      const items = getGenerations();
+      items.unshift(item);
+      setGenerations(items);
+      currentGeneratedId = id;
+
+      $("previewImage").src = result.imageUrl;
+      $("captionOutput").textContent = result.caption;
+      setLoadingUI(false);
+      refreshDashboard();
+      renderHistory();
+      toast("Post completo gerado!", "success");
+    };
+
+    window.copyCaption = function () {
+      const item = getCurrentItem();
+      if (!item) {
+        toast("Nada para copiar.", "error");
+        return;
+      }
+      navigator.clipboard
+        .writeText(item.caption)
+        .then(() => toast("Legenda copiada!", "success"))
+        .catch(() =>
+          toast("Falha ao copiar (permissão do navegador).", "error")
+        );
+    };
+
+    window.downloadImage = function () {
+      const item = getCurrentItem();
+      if (!item) {
+        toast("Nada para baixar.", "error");
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = item.imageUrl;
+      a.download = `stratai_${item.brandName.replace(/\s+/g, "_").toLowerCase()}_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast("Download iniciado!", "success");
+    };
+
+    window.variant = function (kind) {
+      const item = getCurrentItem();
+      if (!item) {
+        toast("Nada para ajustar.", "error");
+        return;
+      }
+      let caption = item.caption;
+
+      if (kind === "short") {
+        caption =
+          caption.split("\n").slice(0, 6).join("\n") +
+          "\n\n" +
+          (caption.match(/#\S+/g) || []).slice(0, 6).join(" ");
+      } else if (kind === "formal") {
+        caption = caption
+          .replace("🔥", "")
+          .replace("📲", "")
+          .replace("💬", "")
+          .replace("💾", "")
+          .replace(/!/g, ".")
+          .replace(/✅/g, "•");
+      } else if (kind === "persuasive") {
+        caption =
+          "🚀 " +
+          caption.replace(
+            "✅",
+            "✅ BENEFÍCIOS"
+          ) +
+          "\n\n⚡ Oferta por tempo limitado.";
+      }
+
+      $("captionOutput").textContent = caption;
+      toast("Variação aplicada.", "success");
+    };
+
+    // ==========================================================
+    //  DASHBOARD + HISTÓRICO
+    // ==========================================================
+    function refreshDashboard() {
+      const brands = getBrands();
+      const gens = getGenerations();
+      const mk = monthKey(new Date());
+      const monthCount = gens.filter(
+        (g) => monthKey(new Date(g.createdAt)) === mk
+      ).length;
+
+      $("statContentsMonth").textContent = String(monthCount);
+      $("statBrands").textContent = String(brands.length);
+      $("statGenerations").textContent = String(gens.length);
+
+      const last = gens[0];
+      $("statLastType").textContent = last ? labelContentType(last.platform) : "—";
+      $("statLastBrand").textContent = last ? last.brandName : "—";
+
+      const list = $("recentList");
+      if (!list) return;
+
+      if (!gens.length) {
+        list.innerHTML =
+          '<li class="text-sm text-slate-500">Nenhum conteúdo gerado ainda.</li>';
+        return;
+      }
+
+      list.innerHTML = gens
+        .slice(0, 6)
+        .map(
+          (g) => `
+          <li class="border border-slate-200 rounded-2xl p-4 bg-slate-50/40">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-bold text-slate-900">${escapeHtml(
+                  labelContentType(g.platform)
+                )}</p>
+                <p class="text-xs text-slate-600 mt-1">
+                  <strong>${escapeHtml(g.brandName)}</strong> • ${escapeHtml(
+            g.objective || ""
+          )}
+                </p>
+                <p class="text-xs text-slate-500 mt-1">
+                  <i class="fa-regular fa-clock"></i> ${formatDateTimeBR(
+                    g.createdAt
+                  )}
+                </p>
+                <p class="text-sm text-slate-700 mt-3 leading-relaxed">
+                  ${escapeHtml(g.briefing || "")}
+                </p>
+              </div>
+              <button class="text-xs px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100"
+                onclick="openGenerated('${g.id}')">
+                <i class="fa-solid fa-eye"></i> Ver
+              </button>
+            </div>
+          </li>
+        `
+        )
+        .join("");
+    }
+
+    function renderHistory() {
+      const list = $("historyList");
+      if (!list) return;
+      const gens = getGenerations();
+
+      if (!gens.length) {
+        list.innerHTML =
+          '<li class="text-sm text-slate-500">Nenhum conteúdo ainda.</li>';
+        return;
+      }
+
+      list.innerHTML = gens
+        .slice(0, 30)
+        .map(
+          (g) => `
+          <li class="border border-slate-200 rounded-2xl p-4 bg-slate-50/40">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex gap-3">
+                <div class="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 bg-white">
+                  <img src="${
+                    g.imageUrl ||
+                    svgDataURI({
+                      title: labelContentType(g.platform),
+                      subtitle: g.brandName,
+                    })
+                  }" class="w-full h-full object-cover" alt="thumb" />
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-slate-900">${escapeHtml(
+                    labelContentType(g.platform)
+                  )}</p>
+                  <p class="text-xs text-slate-600 mt-1">
+                    <strong>${escapeHtml(g.brandName)}</strong> • ${escapeHtml(
+            g.objective || ""
+          )}
+                  </p>
+                  <p class="text-xs text-slate-500 mt-1">
+                    <i class="fa-regular fa-clock"></i> ${formatDateTimeBR(
+                      g.createdAt
+                    )}
+                  </p>
+                  <p class="text-sm text-slate-700 mt-2 leading-relaxed">
+                    ${escapeHtml(g.briefing || "")}
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-2">
+                <button class="text-xs px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100"
+                  onclick="openGenerated('${g.id}')">
+                  <i class="fa-solid fa-eye"></i> Abrir
+                </button>
+                <button class="text-xs px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-red-600"
+                  onclick="deleteGenerated('${g.id}')">
+                  <i class="fa-solid fa-trash"></i> Remover
+                </button>
+              </div>
+            </div>
+          </li>
+        `
+        )
+        .join("");
+    }
+
+    window.clearHistory = function () {
+      if (!confirm("Apagar todo o histórico?")) return;
+      setGenerations([]);
+      renderHistory();
+      refreshDashboard();
+      toast("Histórico limpo.", "success");
+    };
+
+    window.deleteGenerated = function (id) {
+      const items = getGenerations().filter((x) => x.id !== id);
+      setGenerations(items);
+      if (currentGeneratedId === id) {
+        currentGeneratedId = null;
+        $("finalContent")?.classList.add("hidden");
+        $("resultArea")?.classList.remove("hidden");
+      }
+      renderHistory();
+      refreshDashboard();
+      toast("Removido.", "success");
+    };
+
+    window.openGenerated = function (id) {
+      const item = getGenerations().find((x) => x.id === id);
+      if (!item) return;
+
+      // pessoal
+      if (item.platform === "personal" || item.mode === "personal") {
+        showSection("create-personal");
+        const imageSrc =
+          item.imageUrl ||
+          svgDataURI({
+            title: labelContentType("personal"),
+            subtitle: item.brandName,
+          });
+        $("personalPreviewImage").src = imageSrc;
+        $("personalCaptionOutput").textContent = item.caption || "";
+
+        $("personalResultArea")?.classList.add("hidden");
+        $("personalFinalContent")?.classList.remove("hidden");
+
+        if ($("personalBriefingInput"))
+          $("personalBriefingInput").value = item.briefing || "";
+        if ($("personalObjectiveSelect"))
+          $("personalObjectiveSelect").value =
+            item.objective || "Compartilhar momento";
+
+        const typeSelect = $("personalTypeSelect");
+        const customInput = $("personalTypeCustom");
+        let foundInSelect = false;
+        if (typeSelect && item.personalType) {
+          for (let opt of typeSelect.options) {
+            if (opt.value === item.personalType) {
+              typeSelect.value = item.personalType;
+              foundInSelect = true;
+              break;
+            }
+          }
+        }
+        if (!foundInSelect && customInput) {
+          typeSelect.value = "";
+          customInput.value = item.personalType || "";
+        }
+
+        lastPersonalResult = {
+          caption: item.caption,
+          imageUrl: item.imageUrl,
+          personalType: item.personalType,
+          objective: item.objective,
+          briefing: item.briefing,
+        };
+        toast("Conteúdo pessoal carregado.", "success");
+        return;
+      }
+
+      // comercial
+      showSection("create");
+      currentGeneratedId = item.id;
+      const imageSrc =
+        item.imageUrl ||
+        svgDataURI({
+          title: labelContentType(item.platform),
+          subtitle: item.brandName,
+        });
+      $("previewImage").src = imageSrc;
+      $("captionOutput").textContent = item.caption || "";
+      $("finalContent")?.classList.remove("hidden");
+      $("resultArea")?.classList.add("hidden");
+
+      if ($("briefingInput")) $("briefingInput").value = item.briefing || "";
+      if ($("objectiveSelect"))
+        $("objectiveSelect").value = item.objective || "Vender";
+      if ($("createBrandSelect"))
+        $("createBrandSelect").value = item.brandId || "";
+
+      selectedContentType = item.platform;
+      document.querySelectorAll(".content-type-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.content === item.platform);
+      });
+      $("typeHint").textContent = `Tipo selecionado: ${labelContentType(
+        item.platform
+      )}`;
+
+      toast("Conteúdo carregado.", "success");
+    };
+
+    // ==========================================================
+    //  INIT
+    // ==========================================================
+    function init() {
+      hydrateCreateBrandSelect();
+      setupContentTypeButtons();
+      renderBrands();
+      renderHistory();
+      refreshDashboard();
+      checkAPI();
+      setupSidebarNavigation();
+      fetchPlanStatus();
+      showSection("dashboard");
+
+      const igInput = $("igHandleInput");
+      if (igInput) {
+        igInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            generateFlyerFromHandle();
+          }
+        });
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
