@@ -5,30 +5,54 @@ body {
     radial-gradient(1000px 700px at 90% 0%, #eef2ff 0%, transparent 50%),
     #f6f7fb;
 }
-.sidebar-item { transition: all 0.25s ease; cursor: pointer; }
-.sidebar-item:hover { background-color: rgba(148,163,184,0.10); color: white; }
+
+.sidebar-item {
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.sidebar-item:hover {
+  background-color: rgba(148, 163, 184, 0.10);
+  color: white;
+}
 .sidebar-item.active {
   background-color: rgba(59,130,246,0.16);
   color: white;
   border-right: 3px solid #3b82f6;
 }
-.card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
-.card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,23,42,0.08); }
-.hidden-section { display: none; }
 
-::-webkit-scrollbar { width: 10px; }
+.card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15,23,42,0.08);
+}
+
+.hidden-section {
+  display: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
 ::-webkit-scrollbar-thumb {
   background: rgba(100,116,139,.35);
   border-radius: 999px;
   border: 2px solid rgba(0,0,0,0);
   background-clip: padding-box;
 }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 :focus-visible {
   outline: 3px solid rgba(59,130,246,0.35);
   outline-offset: 2px;
   border-radius: 10px;
 }
+
+/* Botão de tipo de conteúdo */
 .content-type-btn.active {
   background: #dbeafe;
   border-color: #3b82f6;
@@ -43,7 +67,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  min-height: 300px;
 }
 .preview-img {
   width: 100%;
@@ -53,9 +77,7 @@ body {
   max-height: 650px;
 }
 
-/* FIX PARA O CARD DE SUGESTÃO AUTOMÁTICA 
-   Garante altura fixa e impede esticamento pelo flexbox 
-*/
+/* FIX – card de ideia automática não estica com o flex */
 #autoIdeaBox {
   height: 300px;
   min-height: 300px;

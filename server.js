@@ -10,37 +10,23 @@ import multer from "multer";
 import { createClient } from "@supabase/supabase-js";
 import os from "os";
 
-// =====================================================
-//  CONFIGURAÇÃO INICIAL
-// =====================================================
 const app = express();
 
-// Caminhos para ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middlewares básicos
-// Na Vercel, a pasta public é servida automaticamente, mas mantemos isso para testes locais
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// Configuração de Upload (Multer) - Ajustado para serverless
 const upload = multer({
-  limits: { fileSize: 4.5 * 1024 * 1024 }, // Max 4.5MB para evitar timeout na Vercel
+  limits: { fileSize: 4.5 * 1024 * 1024 },
 });
 
-// Configuração OpenAI
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// =====================================================
-//  STORAGE LOCAL (ADAPTADO PARA VERCEL)
-// =====================================================
-// Em produção (Vercel), usamos /tmp (única pasta gravável).
-// Nota: Arquivos em /tmp são apagados após a execução, então a integração com Meta
-// precisará ser refeita no futuro para usar Banco de Dados se quiser persistência longa.
-const STORAGE_DIR = process.env.NODE_ENV === "production" 
-  ? os.tmpdir() 
+const STORAGE_DIR = process.env.NODE_ENV === "production"
+  ? os.tmpdir()
   : path.join(process.cwd(), "storage");
 
 const TOKENS_FILE = path.join(STORAGE_DIR, "meta_tokens.json");
@@ -54,7 +40,6 @@ function ensureStorage() {
       console.error("Erro ao criar pasta storage:", e);
     }
   }
-  // Cria arquivos vazios se não existirem
   if (!fs.existsSync(TOKENS_FILE)) writeJSON(TOKENS_FILE, {});
   if (!fs.existsSync(POSTS_FILE)) writeJSON(POSTS_FILE, {});
 }
@@ -78,13 +63,9 @@ function writeJSON(file, data) {
   }
 }
 
-// Inicializa storage
 ensureStorage();
 const oauthStateStore = new Set();
 
-// =====================================================
-//  SUPABASE SETUP
-// =====================================================
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
   console.warn("⚠️ AVISO: Variáveis do Supabase não configuradas. Login não funcionará.");
 }
@@ -99,9 +80,7 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder"
 );
 
-// =====================================================
-//  MIDDLEWARE DE AUTENTICAÇÃO
-// =====================================================
+// auth middleware
 async function getUserFromToken(req, res, next) {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
@@ -118,53 +97,15 @@ async function getUserFromToken(req, res, next) {
   next();
 }
 
-// =====================================================
-//  HELPERS AUXILIARES
-// =====================================================
-function j(res, status, payload) {
-  return res.status(status).json(payload);
-}
-
-function buildCorpusFromPosts(posts = []) {
-  return posts
-    .filter((p) => (p.caption || "").trim().length > 0)
-    .slice(0, 25)
-    .map((p, i) => `--- POST ${i + 1} ---\n${(p.caption || "").slice(0, 500)}\n`)
-    .join("\n")
-    .slice(0, 12000);
-}
-
-async function fbGet(url, accessToken) {
-  const finalUrl = url + (url.includes("?") ? "&" : "?") + `access_token=${encodeURIComponent(accessToken)}`;
-  const r = await fetch(finalUrl);
-  const data = await r.json();
-  if (!r.ok) throw new Error(data?.error?.message || `HTTP ${r.status}`);
-  return data;
-}
-
-// =====================================================
-//  LÓGICA DE IA
-// =====================================================
-async function inferVisualStyleFromLocalIgPosts(igId) {
-  // Na Vercel, essa função pode retornar null se o arquivo temporário foi limpo
-  try {
-    const postsDb = readJSON(POSTS_FILE, {});
-    const pack = postsDb[igId];
-    if (!pack?.posts?.length) return null;
-
-    // (Lógica simplificada para economizar tokens em inferência visual repetida)
-    return null; 
-  } catch {
-    return null;
-  }
+function buildTextPrompt(kind, { brand, objective, briefing }) {
+  return `Crie legenda para ${kind}. Marca: ${brand.name}. Objetivo: ${objective}. Briefing: ${briefing}. Retorne JSON {caption, hashtags}.`;
 }
 
 async function generateImageWithOpenAI({ imagePrompt, size }) {
-  const modelToUse = process.env.OPENAI_IMAGE_MODEL || "dall-e-3"; // ou gpt-image-1 se disponível
-  
+  const modelToUse = process.env.OPENAI_IMAGE_MODEL || "dall-e-3";
+
   console.log(`🎨 Gerando Imagem | Modelo: ${modelToUse}`);
 
-  // Chamada sem response_format para evitar erro 400 em modelos novos
   const img = await client.images.generate({
     model: modelToUse,
     prompt: imagePrompt,
@@ -172,11 +113,10 @@ async function generateImageWithOpenAI({ imagePrompt, size }) {
   });
 
   const first = img.data[0];
-  
+
   if (first.b64_json) {
     return first.b64_json;
   } else if (first.url) {
-    console.log("📥 Baixando URL da imagem...");
     const r = await fetch(first.url);
     const arr = await r.arrayBuffer();
     return Buffer.from(arr).toString("base64");
@@ -185,135 +125,158 @@ async function generateImageWithOpenAI({ imagePrompt, size }) {
   throw new Error("Sem dados de imagem retornados.");
 }
 
-// ... (Builders de Prompt mantidos simples para economizar espaço) ...
-function resolveContentKind(type, platform) { return (type || platform || "").toLowerCase().includes("insta") ? "instagram" : "generic"; }
-function buildTextPrompt(kind, { brand, objective, briefing }) {
-  return `Crie legenda para ${kind}. Marca: ${brand.name}. Objetivo: ${objective}. Briefing: ${briefing}. Retorne JSON {caption, hashtags}.`;
-}
+// rotas básicas
+app.get("/", (req, res) =>
+  res.sendFile(path.join(process.cwd(), "public", "index.html"))
+);
+app.get("/app", (req, res) =>
+  res.sendFile(path.join(process.cwd(), "public", "painel.html"))
+);
+app.get("/health", (req, res) =>
+  res.json({ ok: true, status: "online", env: process.env.NODE_ENV })
+);
 
-// =====================================================
-//  ROTAS PÚBLICAS
-// =====================================================
-// Rota de fallback para servir o frontend se a Vercel não servir o estático primeiro
-app.get("/", (req, res) => res.sendFile(path.join(process.cwd(), "public", "index.html")));
-app.get("/app", (req, res) => res.sendFile(path.join(process.cwd(), "public", "painel.html")));
-app.get("/health", (req, res) => res.json({ ok: true, status: "online", env: process.env.NODE_ENV }));
-
-// =====================================================
-//  ROTAS DE AUTENTICAÇÃO
-// =====================================================
+// AUTH
 app.post("/auth/register", async (req, res) => {
   const { name, email, phone, password } = req.body;
-  if (!email || !password) return res.status(400).json({ ok: false, error: "Dados incompletos." });
+  if (!email || !password)
+    return res.status(400).json({ ok: false, error: "Dados incompletos." });
 
   const { data, error } = await supabase.auth.signUp({
-    email, password, options: { data: { full_name: name, phone } }
+    email,
+    password,
+    options: { data: { full_name: name, phone } },
   });
 
   if (error) return res.status(400).json({ ok: false, error: error.message });
 
   if (data.user) {
-    await supabaseAdmin.from("profiles").upsert({ id: data.user.id, full_name: name, phone });
-    await supabaseAdmin.from("plans").insert({ user_id: data.user.id, status: "trial", trial_days: 7, trial_started_at: new Date() });
-    await supabaseAdmin.from("users").upsert({ id: data.user.id, name: name || email, email });
+    await supabaseAdmin
+      .from("profiles")
+      .upsert({ id: data.user.id, full_name: name, phone });
+    await supabaseAdmin
+      .from("plans")
+      .insert({
+        user_id: data.user.id,
+        status: "trial",
+        trial_days: 7,
+        trial_started_at: new Date(),
+      });
+    await supabaseAdmin
+      .from("users")
+      .upsert({ id: data.user.id, name: name || email, email });
   }
 
-  return res.json({ ok: true, token: data.session?.access_token, user: { id: data.user?.id, name, email } });
+  return res.json({
+    ok: true,
+    token: data.session?.access_token,
+    user: { id: data.user?.id, name, email },
+  });
 });
 
 app.post("/auth/login", async (req, res) => {
   const { identifier, password } = req.body;
-  const { data, error } = await supabase.auth.signInWithPassword({ email: identifier, password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: identifier,
+    password,
+  });
 
   if (error) return res.status(400).json({ ok: false, error: "Credenciais inválidas." });
 
-  // Pega nome do profile
-  const { data: profile } = await supabaseAdmin.from("profiles").select("full_name").eq("id", data.user.id).single();
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("full_name")
+    .eq("id", data.user.id)
+    .single();
+
   const userName = profile?.full_name || data.user.user_metadata?.full_name || null;
 
-  return res.json({ 
-    ok: true, 
-    token: data.session.access_token, 
-    user: { id: data.user.id, name: userName, email: data.user.email } 
+  return res.json({
+    ok: true,
+    token: data.session.access_token,
+    user: { id: data.user.id, name: userName, email: data.user.email },
   });
 });
 
 app.get("/auth/plan", getUserFromToken, async (req, res) => {
-    const { data: plan } = await supabaseAdmin.from("plans").select("*").eq("user_id", req.user.id).maybeSingle();
-    const { data: profile } = await supabaseAdmin.from("profiles").select("full_name").eq("id", req.user.id).single();
-    
-    let status = plan?.status || "none";
-    // Lógica simplificada de dias
-    let daysLeft = 7; 
-    
-    return res.json({ 
-        ok: true, 
-        plan: { status, daysLeft }, 
-        user: { id: req.user.id, email: req.user.email, name: profile?.full_name } 
-    });
+  const { data: plan } = await supabaseAdmin
+    .from("plans")
+    .select("*")
+    .eq("user_id", req.user.id)
+    .maybeSingle();
+
+  const { data: profile } = await supabaseAdmin
+    .from("profiles")
+    .select("full_name")
+    .eq("id", req.user.id)
+    .single();
+
+  let status = plan?.status || "none";
+  let daysLeft = 7;
+
+  return res.json({
+    ok: true,
+    plan: { status, daysLeft },
+    user: { id: req.user.id, email: req.user.email, name: profile?.full_name },
+  });
 });
 
-// =====================================================
-//  GERAÇÃO IA
-// =====================================================
+// IA – geração de post completo
 app.post("/api/generate-post", upload.array("referenceImages", 3), async (req, res) => {
   try {
     let { brand, objective, briefing, contentType, platform } = req.body;
     if (typeof brand === "string") brand = JSON.parse(brand || "{}");
-
     if (!brand.name) brand.name = "Minha Marca";
 
-    // 1. Texto
-    const textPrompt = buildTextPrompt(contentType || platform, { brand, objective, briefing });
+    const kind = contentType || platform || "instagram";
+    const textPrompt = buildTextPrompt(kind, { brand, objective, briefing });
+
     const textResp = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: textPrompt }],
     });
-    
+
     let rawText = textResp.choices[0].message.content.replace(/```json|```/g, "");
     let caption = rawText;
-    try { 
-        const json = JSON.parse(rawText); 
-        caption = json.caption + (json.hashtags ? "\n\n" + json.hashtags.join(" ") : "");
+    try {
+      const json = JSON.parse(rawText);
+      caption =
+        json.caption +
+        (json.hashtags ? "\n\n" + json.hashtags.join(" ") : "");
     } catch {}
 
-    // 2. Imagem
     const imagePrompt = `Crie um flyer publicitário profissional para ${brand.name}. Tema: ${briefing}. Objetivo: ${objective}. Texto em PT-BR.`;
-    
-    // Tamanho baseado no tipo
     let size = "1024x1024";
-    if (String(contentType).includes("story")) size = "1024x1792";
+    if (String(contentType).toLowerCase().includes("story"))
+      size = "1024x1792";
 
     const b64 = await generateImageWithOpenAI({ imagePrompt, size });
 
-    res.json({ ok: true, caption, imageUrl: `data:image/png;base64,${b64}` });
-
+    res.json({
+      ok: true,
+      caption,
+      imageUrl: `data:image/png;base64,${b64}`,
+    });
   } catch (e) {
     console.error("Erro generate-post:", e);
     res.status(500).json({ ok: false, error: e.message });
   }
 });
 
-// Rota de Template Flyer (Simplificada)
+// Template simples
 app.post("/api/templates/ig-flyer", async (req, res) => {
-    try {
-        const { handle } = req.body;
-        const b64 = await generateImageWithOpenAI({ 
-            imagePrompt: `Crie um flyer moderno para o instagram @${handle}.`, 
-            size: "1024x1024" 
-        });
-        res.json({ ok: true, imageUrl: `data:image/png;base64,${b64}` });
-    } catch(e) {
-        res.status(500).json({ok: false, error: e.message});
-    }
+  try {
+    const { handle } = req.body;
+    const b64 = await generateImageWithOpenAI({
+      imagePrompt: `Crie um flyer moderno para o instagram @${handle}.`,
+      size: "1024x1024",
+    });
+    res.json({ ok: true, imageUrl: `data:image/png;base64,${b64}` });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
 });
 
-
-// =====================================================
-//  EXPORTAÇÃO PARA VERCEL
-// =====================================================
-// Em desenvolvimento local, rodamos o listen.
-// Em produção (Vercel), exportamos o app.
 if (process.env.NODE_ENV !== "production") {
   const PORT_LOCAL = process.env.PORT || 3001;
   app.listen(PORT_LOCAL, () => {

@@ -14,10 +14,11 @@
   <link rel="stylesheet" href="./css/nexoraai-panel.css">
 </head>
 
-<body class="flex h-screen overflow-hidden text-slate-900">
+<body class="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-900">
 
-  <aside class="w-72 bg-slate-950 text-slate-300 flex flex-col relative z-50">
-    <div class="p-6 border-b border-slate-800/70">
+  <!-- SIDEBAR -->
+  <aside class="w-full lg:w-72 bg-slate-950 text-slate-300 flex flex-col relative z-50 flex-shrink-0">
+    <div class="p-4 sm:p-6 border-b border-slate-800/70">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-indigo-600/20 flex items-center justify-center border border-indigo-500/20">
           <i class="fa-solid fa-layer-group text-indigo-400"></i>
@@ -44,7 +45,7 @@
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
 
-        <li data-section="create" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
+        <li data-section="create-mode" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
           <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
             <i class="fa-solid fa-pen-nib text-slate-200"></i>
           </span>
@@ -84,6 +85,28 @@
           <div class="flex-1">
             <p class="text-sm font-semibold">Histórico</p>
             <p class="text-xs text-slate-400">Gerações passadas</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+        </li>
+
+        <li data-section="profile" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
+          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+            <i class="fa-regular fa-user text-slate-200"></i>
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Meu Perfil</p>
+            <p class="text-xs text-slate-400">Dados do usuário</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
+        </li>
+
+        <li data-section="billing" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
+          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+            <i class="fa-regular fa-credit-card text-slate-200"></i>
+          </span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold">Assinatura</p>
+            <p class="text-xs text-slate-400">Plano e teste</p>
           </div>
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
@@ -162,28 +185,31 @@
     </div>
   </aside>
 
+  <!-- MAIN -->
   <main class="flex-1 flex flex-col overflow-y-auto relative">
-    <header class="sticky top-0 z-20 backdrop-blur bg-white/55 border-b border-slate-200/70">
-      <div class="px-8 py-4 flex items-center justify-between gap-4">
+    <header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200/70">
+      <div class="px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between gap-4">
         <div>
           <p class="text-xs text-slate-500">Bem-vindo de volta</p>
           <h2 class="text-lg font-bold text-slate-800">Painel NexoraAI</h2>
         </div>
-        <button onclick="openSuggestionAuto()" class="bg-indigo-600 text-white px-5 py-2 rounded-2xl shadow-sm hover:bg-indigo-700 text-sm font-semibold transition-colors">
+        <button onclick="openSuggestionAuto()" class="bg-indigo-600 text-white px-4 sm:px-5 py-2 rounded-2xl shadow-sm hover:bg-indigo-700 text-xs sm:text-sm font-semibold transition-colors">
           <i class="fa-solid fa-lightbulb mr-1"></i> Sugestão
         </button>
       </div>
     </header>
 
-    <section id="dashboard" class="p-8">
-      <div class="flex items-start justify-between gap-4 mb-6">
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="p-4 sm:p-6 lg:p-8">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-bold text-slate-900">Painel Central</h2>
           <p class="text-sm text-slate-600">Resumo de performance e próximos passos.</p>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+      <!-- CARDS PRINCIPAIS + IDEIA AUTOMÁTICA -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div class="flex items-center justify-between">
             <p class="text-slate-500 text-sm">Conteúdos este mês</p>
@@ -217,19 +243,37 @@
           <p class="text-xs text-slate-500 mt-1">Total</p>
         </div>
 
-        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <div class="flex items-center justify-between">
-            <p class="text-slate-500 text-sm">Último conteúdo</p>
-            <span class="w-10 h-10 rounded-2xl bg-purple-600/10 border border-purple-500/15 flex items-center justify-center">
-              <i class="fa-solid fa-chart-line text-purple-600"></i>
-            </span>
+        <!-- IDEIA AUTOMÁTICA AGORA AQUI -->
+        <div id="autoIdeaBox" class="card p-6 rounded-2xl shadow-sm border border-slate-200 bg-gradient-to-br from-indigo-600 to-purple-700 text-white relative overflow-hidden flex flex-col justify-center items-start">
+          <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+          <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-xl"></div>
+          
+          <div class="relative z-10">
+            <h3 class="font-bold mb-3 flex items-center gap-2 text-lg">
+              <i class="fa-solid fa-lightbulb"></i> Ideia Automática
+            </h3>
+            <p class="text-xs sm:text-sm opacity-95 mb-4 leading-relaxed">
+              Deixe a IA analisar o mês atual e criar uma campanha estratégica completa para sua marca agora.
+            </p>
+            <button onclick="openSuggestionAuto()" class="bg-white text-indigo-700 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold shadow hover:bg-slate-100 transition transform hover:scale-105">
+              Gerar sugestão
+            </button>
           </div>
-          <p id="statLastType" class="mt-3 text-lg font-bold text-slate-900">—</p>
-          <p id="statLastBrand" class="text-xs text-slate-500 mt-1">—</p>
         </div>
       </div>
 
+      <!-- ÚLTIMO CONTEÚDO + LISTA -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800">Último conteúdo</h3>
+          </div>
+          <div>
+            <p id="statLastType" class="text-lg font-bold text-slate-900 mb-1">—</p>
+            <p id="statLastBrand" class="text-xs text-slate-500">—</p>
+          </div>
+        </div>
+
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-bold text-slate-800">Últimos conteúdos gerados</h3>
@@ -238,27 +282,11 @@
             <li class="text-sm text-slate-500">Nenhum conteúdo gerado ainda.</li>
           </ul>
         </div>
-        
-        <div id="autoIdeaBox" class="p-6 rounded-2xl shadow-sm border border-slate-200 bg-gradient-to-br from-indigo-600 to-purple-700 text-white relative overflow-hidden h-[300px] min-h-[300px] max-h-[300px] flex flex-col justify-center items-start">
-          <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
-          <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-xl"></div>
-          
-          <div class="relative z-10">
-            <h3 class="font-bold mb-3 flex items-center gap-2 text-xl">
-              <i class="fa-solid fa-lightbulb"></i> Ideia Automática
-            </h3>
-            <p class="text-sm opacity-95 mb-6 leading-relaxed">
-              Deixe a IA analisar o mês atual e criar uma campanha estratégica completa para sua marca agora.
-            </p>
-            <button onclick="openSuggestionAuto()" class="bg-white text-indigo-700 px-5 py-3 rounded-2xl text-sm font-bold shadow hover:bg-slate-100 transition transform hover:scale-105">
-              Gerar sugestão
-            </button>
-          </div>
-        </div>
       </div>
     </section>
 
-    <section id="brands" class="p-8 hidden-section">
+    <!-- MINHAS MARCAS -->
+    <section id="brands" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Minhas Marcas</h2>
         <p class="text-sm text-slate-600">Cadastre cada marca para evitar conteúdo genérico.</p>
@@ -333,7 +361,8 @@
       </div>
     </section>
 
-    <section id="templates" class="p-8 hidden-section">
+    <!-- SUGESTÕES -->
+    <section id="templates" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Sugestões Estratégicas</h2>
         <p class="text-sm text-slate-600">
@@ -341,25 +370,26 @@
         </p>
       </div>
 
-      <div class="flex flex-col items-center justify-center min-h-[400px] bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center max-w-3xl mx-auto">
-        <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-6 text-3xl shadow-sm border border-indigo-100">
+      <div class="flex flex-col items-center justify-center min-h-[320px] sm:min-h-[400px] bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 text-center max-w-3xl mx-auto">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-6 text-2xl sm:text-3xl shadow-sm border border-indigo-100">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
         
-        <h3 class="text-2xl font-bold text-slate-900 mb-3">Gerador de Campanhas Inteligente</h3>
+        <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-3">Gerador de Campanhas Inteligente</h3>
         
-        <p class="text-slate-600 mb-8 max-w-lg leading-relaxed">
+        <p class="text-slate-600 mb-8 max-w-lg leading-relaxed text-sm sm:text-base">
           O sistema analisa o mês atual, feriados, datas comemorativas e o perfil da sua marca para criar um briefing completo e gerar a imagem automaticamente.
         </p>
         
-        <button onclick="openSuggestionAuto()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 flex items-center gap-3 transform hover:scale-105 duration-200">
+        <button onclick="openSuggestionAuto()" class="bg-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 flex items-center gap-3 transform hover:scale-105 duration-200">
           <i class="fa-solid fa-bolt"></i>
           Gerar Sugestão Agora
         </button>
       </div>
     </section>
 
-    <section id="history" class="p-8 hidden-section">
+    <!-- HISTÓRICO -->
+    <section id="history" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Histórico</h2>
         <p class="text-sm text-slate-600">Veja e recarregue conteúdos gerados anteriormente.</p>
@@ -378,7 +408,8 @@
       </div>
     </section>
 
-    <section id="create-mode" class="p-8 hidden-section">
+    <!-- ESCOLHA TIPO DE CRIAÇÃO -->
+    <section id="create-mode" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo</h2>
         <p class="text-sm text-slate-600">Escolha se o conteúdo será para uso comercial (empresas, marcas) ou pessoal.</p>
@@ -417,7 +448,8 @@
       </div>
     </section>
 
-    <section id="create-personal" class="p-8 hidden-section">
+    <!-- CRIAÇÃO PESSOAL -->
+    <section id="create-personal" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Criar conteúdo pessoal</h2>
         <p class="text-sm text-slate-600">
@@ -432,6 +464,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <select id="personalTypeSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-indigo-500">
                 <option value="">Selecione o tipo de conteúdo...</option>
+                <!-- (lista original mantida) -->
                 <option>Flyer de aniversário infantil</option>
                 <option>Flyer de aniversário adulto</option>
                 <option>Convite de aniversário simples</option>
@@ -556,7 +589,7 @@
           </div>
 
           <div id="personalFinalContent" class="hidden bg-white h-full p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-4 border-b border-slate-200 pb-3">
               <h3 class="font-bold text-slate-800">Resultado gerado (pessoal)</h3>
               <div class="flex gap-2">
                 <button type="button" onclick="copyCaptionPersonal()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
@@ -595,7 +628,8 @@
       </div>
     </section>
 
-    <section id="create" class="p-8 hidden-section">
+    <!-- CRIAÇÃO COMERCIAL -->
+    <section id="create" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Criar novo conteúdo (Comercial)</h2>
         <p class="text-sm text-slate-600">
@@ -695,7 +729,7 @@
           </div>
 
           <div id="finalContent" class="hidden bg-white h-full p-6 rounded-2xl shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-4 border-b border-slate-200 pb-3">
               <h3 class="font-bold text-slate-800">Resultado gerado</h3>
               <div class="flex gap-2">
                 <button type="button" onclick="copyCaption()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
@@ -734,7 +768,8 @@
       </div>
     </section>
 
-    <section id="profile" class="p-8 hidden-section">
+    <!-- PERFIL -->
+    <section id="profile" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Meu Perfil</h2>
         <p class="text-sm text-slate-600">
@@ -742,9 +777,8 @@
         </p>
       </div>
 
-      <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-xl">
+      <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 max-w-xl">
         <div class="space-y-5">
-          
           <div class="flex items-center gap-4 mb-4">
             <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl font-bold border border-slate-200">
               <i class="fa-solid fa-user"></i>
@@ -790,7 +824,8 @@
       </div>
     </section>
 
-    <section id="billing" class="p-8 hidden-section">
+    <!-- ASSINATURA -->
+    <section id="billing" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-900">Assinatura</h2>
         <p class="text-sm text-slate-600">
