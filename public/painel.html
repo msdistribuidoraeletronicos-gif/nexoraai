@@ -9,94 +9,465 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./css/nexoraai-panel.css">
 
-  <!-- 🔹 Apenas MELHORIA VISUAL: não altera nenhuma funcionalidade -->
   <style>
+    :root {
+      /* Paleta 60-30-10 */
+      --page-bg: #f4f5fb;           /* 60% – fundo neutro geral */
+      --shell-bg: #ffffff;          /* cartões / caixas principais */
+      --shell-subtle: #e5e7eb;      /* divisórias suaves */
+
+      --ink-main: #0f172a;          /* texto principal */
+      --ink-soft: #6b7280;          /* texto secundário */
+      --ink-mute: #9ca3af;          /* texto de apoio */
+
+      --nav-bg-1: #020617;          /* 30% – estrutura: sidebar */
+      --nav-bg-2: #0b1020;
+
+      --accent: #f97316;            /* 10% – ação principal (Von Restorff) */
+      --accent-strong: #ea580c;
+      --accent-soft: #ffedd5;
+
+      --success: #22c55e;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --warning: #eab308;
+
+      --radius-xl: 1.25rem;
+      --radius-lg: 0.9rem;
+
+      --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --shadow-strong: 0 22px 45px rgba(15, 23, 42, 0.16);
+    }
+
+    /* ===========================
+       BASE / TIPOGRAFIA
+    ============================ */
     body {
       font-family: 'Inter', sans-serif;
+      color: var(--ink-main);
       background:
         radial-gradient(1200px 800px at 20% 10%, #e0f2fe 0%, transparent 55%),
         radial-gradient(1000px 700px at 90% 0%, #eef2ff 0%, transparent 50%),
         linear-gradient(to bottom, #f8fafc, #e2e8f0);
     }
 
-    /* Efeito geral dos cards */
-    .card {
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    }
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
-      border-color: rgba(79, 70, 229, 0.35);
+    h1, h2, h3, .kpi-number {
+      font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      letter-spacing: -0.03em;
     }
 
-    /* Sidebar: efeito visual e ícones maiores */
+    /* Affordance: tudo que é clicável "parece clicável" */
+    button,
+    [role="button"],
+    .sidebar-item,
+    .card-clickable {
+      cursor: pointer;
+      transition:
+        transform 0.16s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        opacity 0.15s ease,
+        filter 0.15s ease;
+    }
+
+    button:active,
+    [role="button"]:active,
+    .sidebar-item:active,
+    .card-clickable:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.20);
+    }
+
+    /* Campos de formulário claros e "convidativos" */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+      border-radius: var(--radius-xl);
+      border: 1px solid #d1d5db;
+      background-color: #ffffff;
+      transition:
+        border-color 0.16s ease,
+        box-shadow 0.16s ease,
+        background-color 0.16s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.5), 0 16px 30px rgba(15, 23, 42, 0.18);
+      background-color: #f9fafb;
+    }
+
+    /* Placeholder mais suave */
+    ::placeholder {
+      color: #9ca3af;
+    }
+
+    /* ===========================
+       CARDS PRINCIPAIS
+    ============================ */
+    .card {
+      background-color: var(--shell-bg);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-soft);
+      border-color: rgba(79, 70, 229, 0.30);
+      background: radial-gradient(circle at top left, #ffffff, #f9fafb);
+    }
+
+    /* KPI number – bem visível, fácil de "bater o olho" */
+    .kpi-number {
+      font-size: 2.4rem;
+      line-height: 1;
+    }
+
+    /* ===========================
+       SIDEBAR (Lei de Jakob + 30%)
+    ============================ */
+    .sidebar-desktop-only {
+      background: radial-gradient(circle at 0% 0%, var(--nav-bg-2), var(--nav-bg-1));
+      box-shadow: 10px 0 30px rgba(15, 23, 42, 0.35);
+    }
+
     .sidebar-item {
-      transition: background 0.18s ease, transform 0.16s ease, border-color 0.18s ease;
+      border-radius: 999px;
       border: 1px solid transparent;
+      padding: 0.65rem 0.9rem;
+      background: transparent;
     }
-    .sidebar-item:hover {
-      background: rgba(15, 23, 42, 0.9);
-      border-color: rgba(148, 163, 184, 0.4);
-      transform: translateX(2px);
-    }
-    .sidebar-item.active {
-      background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.35), rgba(15, 23, 42, 1));
-      border: 1px solid rgba(129, 140, 248, 0.6);
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.6);
-    }
-    /* Ícone do menu lateral – mais presença */
+
     .sidebar-item > span {
-      width: 2.75rem;   /* maior */
-      height: 2.75rem;
-      border-radius: 0.9rem;
+      width: 2.7rem;
+      height: 2.7rem;
+      border-radius: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 30% 0%, rgba(129, 140, 248, 0.75), rgba(15, 23, 42, 1));
+      background: radial-gradient(circle at 30% 0%, rgba(129, 140, 248, 0.9), #020617);
       border: 1px solid rgba(129, 140, 248, 0.5);
-      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.75);
+      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.9);
+      flex-shrink: 0;
     }
+
     .sidebar-item > span i {
       font-size: 1.1rem;
     }
-    /* Forçar que a sidebar NUNCA apareça em telas menores que 1024px */
-@media (max-width: 1023.98px) {
-  .sidebar-desktop-only {
-    display: none !important;
-  }
-}
 
+    .sidebar-item:hover {
+      background: rgba(15, 23, 42, 0.85);
+      border-color: rgba(148, 163, 184, 0.4);
+      transform: translateX(4px);
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.7);
+    }
+
+    .sidebar-item.active {
+      background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.7), rgba(15, 23, 42, 1));
+      border-color: rgba(129, 140, 248, 0.95);
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.95);
+    }
+
+    .badge-soft {
+      border-radius: 999px;
+      padding: 0.18rem 0.7rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    /* Avatar / inicial do usuário mais "app moderno" */
+    .user-avatar {
+      background: conic-gradient(from 210deg, #4f46e5, #6366f1, #ec4899, #f97316, #22c55e, #4f46e5);
+      padding: 1px;
+      border-radius: 20px;
+    }
+
+    .user-avatar-inner {
+      border-radius: 18px;
+      background: radial-gradient(circle at 30% 0%, #1f2937, #020617);
+    }
+
+    /* ===========================
+       BOTÕES – Regras 60-30-10 + Von Restorff
+    ============================ */
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      box-shadow: 0 18px 40px rgba(234, 88, 12, 0.40);
+      border: none;
+      white-space: nowrap;
+    }
+
+    .btn-accent:hover {
+      filter: brightness(1.03);
+      transform: translateY(-1px);
+      box-shadow: 0 22px 50px rgba(234, 88, 12, 0.55);
+    }
+
+    .btn-accent:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 12px 25px rgba(234, 88, 12, 0.6);
+    }
+
+    .btn-accent i {
+      font-size: 0.9rem;
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 0.45rem 0.95rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: rgba(248, 250, 252, 0.95);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    .btn-ghost:hover {
+      background: #e5edff;
+      box-shadow: 0 10px 24px rgba(148, 163, 184, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Botões de tipo de conteúdo (affordance forte) */
+    .content-type-btn {
+      border-radius: 999px;
+      background: #f9fafb;
+      border-color: #e5e7eb;
+    }
+
+    .content-type-btn:hover {
+      background: #eef2ff;
+      border-color: #4f46e5;
+      box-shadow: 0 10px 22px rgba(79, 70, 229, 0.25);
+    }
+
+    .content-type-btn.active {
+      background: #4f46e5;
+      color: #eef2ff;
+      border-color: #4338ca;
+      box-shadow: 0 16px 32px rgba(79, 70, 229, 0.45);
+    }
+
+    /* ===========================
+       PREVIEW / RESULTADOS (Skeleton + micro-interações)
+    ============================ */
+    .preview-container {
+      border-radius: 1.5rem;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top, #f9fafb, #e5e7eb);
+      padding: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 260px;
+    }
+
+    .preview-img {
+      border-radius: 1.3rem;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .preview-img:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: var(--shadow-strong);
+    }
+
+    /* Skeleton screens – Performance percebida */
+    @keyframes skeletonPulse {
+      0% { background-position: -200px 0; }
+      100% { background-position: 200px 0; }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%);
+      background-size: 400px 100%;
+      border-radius: 999px;
+      animation: skeletonPulse 1.4s ease-in-out infinite;
+    }
+
+    .skeleton-rect {
+      border-radius: 1rem;
+    }
+
+    /* Exemplo de skeleton aplicável em áreas de texto (quando JS quiser) */
+    .skeleton-text {
+      height: 0.7rem;
+      margin-bottom: 0.45rem;
+    }
+
+    /* ===========================
+       API Status pill
+    ============================ */
+    #apiStatus {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+    }
+
+    /* ===========================
+       HEADER / MOBILE USER BAR
+    ============================ */
+    header {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(18px);
+    }
+
+    /* Barra superior – texto mais leve */
+    header h2 {
+      letter-spacing: -0.02em;
+    }
+
+    /* Barra mobile – "chip" de usuário */
+    .mobile-user-chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      padding: 0.4rem 0.7rem;
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    /* ===========================
+       BARRA DE PROGRESSO (Zeigarnik)
+       – pode ser usada para perfil / onboarding
+    ============================ */
+    .progress-shell {
+      width: 100%;
+      border-radius: 999px;
+      background: #e5e7eb;
+      height: 0.45rem;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      width: 60%; /* valor inicial, JS pode alterar depois */
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.4);
+    }
+
+    /* ===========================
+       SEÇÕES / LAYOUT
+    ============================ */
+    main {
+      background: var(--page-bg);
+    }
+
+    section {
+      scroll-margin-top: 80px;
+    }
+
+    /* Campos de dropzone de imagens com affordance forte */
+    .dropzone {
+      border-radius: 1.25rem;
+      border-style: dashed;
+      border-width: 2px;
+      border-color: #cbd5f5;
+      background: #f4f5ff;
+    }
+
+    .dropzone:hover {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      box-shadow: 0 16px 34px rgba(79, 70, 229, 0.22);
+      transform: translateY(-1px);
+    }
+
+    /* Painéis de instrução / dicas */
+    .hint-box {
+      border-radius: 1rem;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+    }
+
+    /* Painéis de destaque (Sugestão automática, plano Pro, etc.) */
+    .feature-panel {
+      border-radius: 1.5rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-panel::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 55%);
+      pointer-events: none;
+    }
+
+    /* Responsividade: sidebar some em telas menores */
+    @media (max-width: 1023.98px) {
+      .sidebar-desktop-only {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 
 <body class="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-900">
 
-  <!-- SIDEBAR – visível apenas em telas grandes -->
-  <aside class="hidden lg:flex lg:w-72 bg-slate-950 text-slate-300 flex-col relative z-50 flex-shrink-0 sidebar-desktop-only">
-
+  <aside class="hidden lg:flex lg:w-72 text-slate-300 flex-col relative z-50 flex-shrink-0 sidebar-desktop-only">
     <div class="p-4 sm:p-6 border-b border-slate-800/70">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-indigo-600/20 flex items-center justify-center border border-indigo-500/20">
-          <i class="fa-solid fa-layer-group text-indigo-400"></i>
+      <button
+        type="button"
+        onclick="goBackToDashboard()"
+        class="flex items-center gap-3 w-full text-left focus:outline-none"
+      >
+        <div class="user-avatar w-10 h-10 rounded-2xl flex items-center justify-center">
+          <div class="user-avatar-inner w-full h-full flex items-center justify-center border border-indigo-500/40">
+            <i class="fa-solid fa-layer-group text-indigo-200 text-lg"></i>
+          </div>
         </div>
         <div>
           <h1 class="text-lg font-bold text-white leading-tight">NexoraAI</h1>
           <p class="text-xs text-slate-400">Inteligência Estratégica</p>
         </div>
-      </div>
+      </button>
     </div>
 
     <nav class="flex-1 mt-4 px-3 overflow-y-auto">
       <p class="px-3 pb-2 text-[11px] uppercase tracking-wider text-slate-500">Navegação</p>
 
       <ul class="space-y-1">
-        <li data-section="dashboard" class="sidebar-item active px-4 py-3 rounded-xl flex items-center gap-3">
-          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-            <i class="fa-solid fa-chart-pie text-slate-200"></i>
+        <li data-section="dashboard" class="sidebar-item active px-4 py-3 flex items-center gap-3">
+          <span>
+            <i class="fa-solid fa-chart-pie text-slate-50"></i>
           </span>
           <div class="flex-1">
             <p class="text-sm font-semibold">Dashboard</p>
@@ -105,9 +476,9 @@
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
 
-        <li data-section="create-mode" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
-          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-            <i class="fa-solid fa-pen-nib text-slate-200"></i>
+        <li data-section="create-mode" class="sidebar-item px-4 py-3 flex items-center gap-3">
+          <span>
+            <i class="fa-solid fa-pen-nib text-slate-50"></i>
           </span>
           <div class="flex-1">
             <p class="text-sm font-semibold">Criar Conteúdo</p>
@@ -116,9 +487,9 @@
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
 
-        <li data-section="brands" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
-          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-            <i class="fa-solid fa-briefcase text-slate-200"></i>
+        <li data-section="brands" class="sidebar-item px-4 py-3 flex items-center gap-3">
+          <span>
+            <i class="fa-solid fa-briefcase text-slate-50"></i>
           </span>
           <div class="flex-1">
             <p class="text-sm font-semibold">Minhas Marcas</p>
@@ -127,20 +498,20 @@
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
 
-        <li data-section="templates" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
-          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-            <i class="fa-solid fa-lightbulb text-slate-200"></i>
+        <li data-section="templates" class="sidebar-item px-4 py-3 flex items-center gap-3">
+          <span>
+            <i class="fa-solid fa-lightbulb text-slate-50"></i>
           </span>
           <div class="flex-1">
             <p class="text-sm font-semibold">Sugestões</p>
-            <p class="text-xs text-slate-400">Campanhas Automáticas</p>
+            <p class="text-xs text-slate-400">Campanhas automáticas</p>
           </div>
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
 
-        <li data-section="history" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
-          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-            <i class="fa-solid fa-clock-rotate-left text-slate-200"></i>
+        <li data-section="history" class="sidebar-item px-4 py-3 flex items-center gap-3">
+          <span>
+            <i class="fa-solid fa-clock-rotate-left text-slate-50"></i>
           </span>
           <div class="flex-1">
             <p class="text-sm font-semibold">Histórico</p>
@@ -149,9 +520,9 @@
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
 
-        <li data-section="profile" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
-          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-            <i class="fa-regular fa-user text-slate-200"></i>
+        <li data-section="profile" class="sidebar-item px-4 py-3 flex items-center gap-3">
+          <span>
+            <i class="fa-regular fa-user text-slate-50"></i>
           </span>
           <div class="flex-1">
             <p class="text-sm font-semibold">Meu Perfil</p>
@@ -160,9 +531,9 @@
           <i class="fa-solid fa-chevron-right text-slate-500 text-xs"></i>
         </li>
 
-        <li data-section="billing" class="sidebar-item px-4 py-3 rounded-xl flex items-center gap-3">
-          <span class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-            <i class="fa-regular fa-credit-card text-slate-200"></i>
+        <li data-section="billing" class="sidebar-item px-4 py-3 flex items-center gap-3">
+          <span>
+            <i class="fa-regular fa-credit-card text-slate-50"></i>
           </span>
           <div class="flex-1">
             <p class="text-sm font-semibold">Assinatura</p>
@@ -175,8 +546,10 @@
 
     <div class="p-4 border-t border-slate-800/70 relative">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-sm">
-          U
+        <div class="user-avatar w-10 h-10 rounded-2xl flex items-center justify-center">
+          <div class="user-avatar-inner w-full h-full flex items-center justify-center text-white font-bold shadow-sm">
+            U
+          </div>
         </div>
         <div class="flex-1">
           <p class="text-sm font-semibold text-white leading-tight max-w-[140px] truncate" data-user-name>Usuário</p>
@@ -194,7 +567,7 @@
 
       <div class="mt-4 flex items-center justify-between text-xs text-slate-400">
         <span>API:</span>
-        <span id="apiStatus" class="px-2 py-1 rounded-full bg-white/5 border border-white/10">checando...</span>
+        <span id="apiStatus">checando...</span>
       </div>
 
       <div
@@ -202,8 +575,10 @@
         class="hidden absolute left-4 right-4 bottom-20 bg-slate-900/95 border border-slate-700 rounded-2xl p-4 shadow-2xl text-slate-100 z-50 backdrop-blur-sm"
       >
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-sm">
-            U
+          <div class="user-avatar w-9 h-9 rounded-2xl flex items-center justify-center">
+            <div class="user-avatar-inner w-full h-full flex items-center justify-center text-white font-bold shadow-sm">
+              U
+            </div>
           </div>
           <div class="flex-1">
             <p class="text-sm font-semibold leading-tight max-w-[180px] truncate" data-user-name>Usuário</p>
@@ -245,24 +620,25 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="flex-1 flex flex-col overflow-y-auto relative">
-    <header class="sticky top-0 z-20 backdrop-blur bg-white/80 border-b border-slate-200/70">
+    <header class="sticky top-0 z-20 border-b border-slate-200/70">
       <div class="px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between gap-4">
         <div>
           <p class="text-xs text-slate-500">Bem-vindo de volta</p>
           <h2 class="text-lg font-bold text-slate-800">Painel NexoraAI</h2>
         </div>
-        <button onclick="openSuggestionAuto()" class="bg-indigo-600 text-white px-4 sm:px-5 py-2 rounded-2xl shadow-sm hover:bg-indigo-700 text-xs sm:text-sm font-semibold transition-colors">
-          <i class="fa-solid fa-lightbulb mr-1"></i> Sugestão
+        <button onclick="openSuggestionAuto()" class="btn-accent text-xs sm:text-sm">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          Sugestão automática
         </button>
       </div>
 
-      <!-- 🔹 MOBILE USER BAR: mostra nome do usuário no mobile e atalho para o perfil -->
       <div class="px-4 sm:px-8 pb-3 flex items-center justify-between gap-3 lg:hidden">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-sm">
-            U
+        <div class="flex items-center gap-3 mobile-user-chip">
+          <div class="user-avatar w-8 h-8 rounded-2xl flex items-center justify-center">
+            <div class="user-avatar-inner w-full h-full flex items-center justify-center text-white font-bold shadow-sm text-xs">
+              U
+            </div>
           </div>
           <div>
             <p class="text-[11px] text-slate-500">Logado como</p>
@@ -278,10 +654,8 @@
           <i class="fa-solid fa-gear text-sm"></i>
         </button>
       </div>
-      <!-- 🔹 FIM MOBILE USER BAR -->
     </header>
 
-    <!-- DASHBOARD -->
     <section id="dashboard" class="p-4 sm:p-6 lg:p-8">
       <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
@@ -290,12 +664,11 @@
         </div>
       </div>
 
-      <!-- MENU PRINCIPAL MOBILE (apenas no celular) -->
       <div class="grid grid-cols-2 gap-3 mb-6 lg:hidden">
         <button
           type="button"
           onclick='document.querySelector("[data-section=dashboard]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
         >
           <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center mb-2">
             <i class="fa-solid fa-chart-pie text-slate-700 text-sm"></i>
@@ -306,7 +679,7 @@
         <button
           type="button"
           onclick='document.querySelector("[data-section=create-mode]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
         >
           <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-2">
             <i class="fa-solid fa-pen-nib text-indigo-600 text-sm"></i>
@@ -317,7 +690,7 @@
         <button
           type="button"
           onclick='document.querySelector("[data-section=brands]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
         >
           <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-2">
             <i class="fa-solid fa-briefcase text-emerald-600 text-sm"></i>
@@ -328,7 +701,7 @@
         <button
           type="button"
           onclick='document.querySelector("[data-section=history]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700"
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
         >
           <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center mb-2">
             <i class="fa-solid fa-clock-rotate-left text-purple-600 text-sm"></i>
@@ -337,63 +710,58 @@
         </button>
       </div>
 
-      <!-- CARDS PRINCIPAIS + IDEIA AUTOMÁTICA -->
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="card bg-white p-6">
           <div class="flex items-center justify-between">
             <p class="text-slate-500 text-sm">Conteúdos este mês</p>
             <span class="w-10 h-10 rounded-2xl bg-indigo-600/10 border border-indigo-500/15 flex items-center justify-center">
               <i class="fa-solid fa-bolt text-indigo-600"></i>
             </span>
           </div>
-          <p id="statContentsMonth" class="mt-3 text-3xl font-bold text-slate-900">0</p>
+          <p id="statContentsMonth" class="mt-3 kpi-number font-bold text-slate-900">0</p>
           <p class="text-xs text-slate-500 mt-1">Baseado no uso deste navegador</p>
         </div>
 
-        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="card bg-white p-6">
           <div class="flex items-center justify-between">
             <p class="text-slate-500 text-sm">Marcas ativas</p>
             <span class="w-10 h-10 rounded-2xl bg-emerald-600/10 border border-emerald-500/15 flex items-center justify-center">
               <i class="fa-solid fa-briefcase text-emerald-600"></i>
             </span>
           </div>
-          <p id="statBrands" class="mt-3 text-3xl font-bold text-slate-900">0</p>
+          <p id="statBrands" class="mt-3 kpi-number font-bold text-slate-900">0</p>
           <p class="text-xs text-slate-500 mt-1">Cadastradas</p>
         </div>
 
-        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="card bg-white p-6">
           <div class="flex items-center justify-between">
             <p class="text-slate-500 text-sm">Gerações feitas</p>
             <span class="w-10 h-10 rounded-2xl bg-blue-600/10 border border-blue-500/15 flex items-center justify-center">
               <i class="fa-solid fa-microchip text-blue-600"></i>
             </span>
           </div>
-          <p id="statGenerations" class="mt-3 text-3xl font-bold text-slate-900">0</p>
+          <p id="statGenerations" class="mt-3 kpi-number font-bold text-slate-900">0</p>
           <p class="text-xs text-slate-500 mt-1">Total</p>
         </div>
 
-        <!-- IDEIA AUTOMÁTICA -->
-        <div id="autoIdeaBox" class="card p-6 rounded-2xl shadow-sm border border-slate-200 bg-gradient-to-br from-indigo-600 to-purple-700 text-white relative overflow-hidden flex flex-col justify-center items-start">
-          <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
-          <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-xl"></div>
-          
+        <div id="autoIdeaBox" class="card feature-panel p-6 bg-gradient-to-br from-indigo-600 to-purple-700 text-white flex flex-col justify-center items-start">
           <div class="relative z-10">
             <h3 class="font-bold mb-3 flex items-center gap-2 text-lg">
-              <i class="fa-solid fa-lightbulb"></i> Ideia Automática
+              <i class="fa-solid fa-lightbulb"></i> Ideia automática
             </h3>
             <p class="text-xs sm:text-sm opacity-95 mb-4 leading-relaxed">
               Deixe a IA analisar o mês atual e criar uma campanha estratégica completa para sua marca agora.
             </p>
-            <button onclick="openSuggestionAuto()" class="bg-white text-indigo-700 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold shadow hover:bg-slate-100 transition transform hover:scale-105">
+            <button onclick="openSuggestionAuto()" class="btn-accent text-xs sm:text-sm bg-white text-slate-900">
+              <i class="fa-solid fa-bolt"></i>
               Gerar sugestão
             </button>
           </div>
         </div>
       </div>
 
-      <!-- ÚLTIMO CONTEÚDO + LISTA -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="card bg-white p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-bold text-slate-800">Último conteúdo</h3>
           </div>
@@ -403,7 +771,7 @@
           </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="card bg-white p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-bold text-slate-800">Últimos conteúdos gerados</h3>
           </div>
@@ -414,7 +782,6 @@
       </div>
     </section>
 
-    <!-- MINHAS MARCAS -->
     <section id="brands" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -431,8 +798,8 @@
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <div class="flex items-center justify-between gap-4 border-b pb-4 mb-5">
+        <div class="card bg-white p-6">
+          <div class="flex items-center justify-between gap-4 border-b pb-4 mb-5 border-slate-200">
             <h3 class="text-lg font-semibold text-slate-900">
               <span class="text-indigo-600">Cadastrar</span> nova marca
             </h3>
@@ -445,23 +812,23 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-slate-700">Nome da Marca</label>
-                <input id="brandName" type="text" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-indigo-500" placeholder="Ex: Restaurante Marineis">
+                <input id="brandName" type="text" class="mt-1 block w-full p-3" placeholder="Ex: Restaurante Marineis">
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-700">Nicho / Segmento</label>
-                <input id="brandNiche" type="text" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-indigo-500" placeholder="Ex: Restaurante, Loja de Roupas...">
+                <input id="brandNiche" type="text" class="mt-1 block w-full p-3" placeholder="Ex: Restaurante, Loja de Roupas...">
               </div>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-slate-700">Público-alvo</label>
-              <textarea id="brandAudience" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-indigo-500" rows="3" placeholder="Ex: Famílias da região, classe média..."></textarea>
+              <textarea id="brandAudience" class="mt-1 block w-full p-3" rows="3" placeholder="Ex: Famílias da região, classe média..."></textarea>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-slate-700">Tom de Voz</label>
-                <select id="brandTone" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-indigo-500">
+                <select id="brandTone" class="mt-1 block w-full p-3">
                   <option>Profissional</option>
                   <option>Informal</option>
                   <option>Autoridade</option>
@@ -471,7 +838,7 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-700">Objetivo Principal</label>
-                <select id="brandGoal" class="mt-1 block w-full border border-slate-300 rounded-2xl p-3 bg-white shadow-sm focus:border-indigo-500">
+                <select id="brandGoal" class="mt-1 block w-full p-3">
                   <option>Vender</option>
                   <option>Gerar Autoridade</option>
                   <option>Engajar</option>
@@ -479,13 +846,13 @@
               </div>
             </div>
 
-            <button type="button" onclick="saveBrand()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-2xl font-semibold mt-4 shadow-sm transition">
+            <button type="button" onclick="saveBrand()" class="w-full btn-accent justify-center mt-4">
               <i class="fa-solid fa-check"></i> Salvar Marca
             </button>
           </form>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div class="card bg-white p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-bold text-slate-800">Marcas cadastradas</h3>
             <button type="button" onclick="clearBrands()" class="text-xs px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100">
@@ -499,7 +866,6 @@
       </div>
     </section>
 
-    <!-- SUGESTÕES -->
     <section id="templates" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -517,7 +883,7 @@
         </button>
       </div>
 
-      <div class="flex flex-col items-center justify-center min-h-[320px] sm:min-h-[400px] bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 text-center max-w-3xl mx-auto">
+      <div class="feature-panel flex flex-col items-center justify-center min-h-[320px] sm:min-h-[400px] bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 text-center max-w-3xl mx-auto">
         <div class="w-16 h-16 sm:w-20 sm:h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-6 text-2xl sm:text-3xl shadow-sm border border-indigo-100">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </div>
@@ -528,14 +894,13 @@
           O sistema analisa o mês atual, feriados, datas comemorativas e o perfil da sua marca para criar um briefing completo e gerar a imagem automaticamente.
         </p>
         
-        <button onclick="openSuggestionAuto()" class="bg-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 flex items-center gap-3 transform hover:scale-105 duration-200">
+        <button onclick="openSuggestionAuto()" class="btn-accent text-sm sm:text-lg">
           <i class="fa-solid fa-bolt"></i>
-          Gerar Sugestão Agora
+          Gerar sugestão agora
         </button>
       </div>
     </section>
 
-    <!-- HISTÓRICO -->
     <section id="history" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -551,7 +916,7 @@
         </button>
       </div>
 
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div class="card bg-white p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-bold text-slate-800">Gerações</h3>
           <button type="button" onclick="clearHistory()" class="text-xs px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100">
@@ -564,7 +929,6 @@
       </div>
     </section>
 
-    <!-- ESCOLHA TIPO DE CRIAÇÃO -->
     <section id="create-mode" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -581,7 +945,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-        <button type="button" onclick="openCreateCommercial()" class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-left hover:border-indigo-500/60">
+        <button type="button" onclick="openCreateCommercial()" class="card bg-white p-6 text-left hover:border-indigo-500/60 card-clickable">
           <div class="flex items-center gap-4 mb-3">
             <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
               <i class="fa-solid fa-briefcase text-indigo-600 text-xl"></i>
@@ -596,7 +960,7 @@
           </p>
         </button>
 
-        <button type="button" onclick="openCreatePersonal()" class="card bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-left hover:border-purple-500/60">
+        <button type="button" onclick="openCreatePersonal()" class="card bg-white p-6 text-left hover:border-purple-500/60 card-clickable">
           <div class="flex items-center gap-4 mb-3">
             <div class="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center">
               <i class="fa-solid fa-user text-purple-600 text-xl"></i>
@@ -613,7 +977,6 @@
       </div>
     </section>
 
-    <!-- CRIAÇÃO PESSOAL -->
     <section id="create-personal" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -633,12 +996,11 @@
 
       <div class="flex flex-col xl:flex-row gap-8">
         <div class="w-full xl:w-1/2 space-y-6">
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="card bg-white p-5">
             <label class="block text-sm font-bold text-slate-800 mb-2">1. Tipo de conteúdo pessoal</label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <select id="personalTypeSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-indigo-500">
+              <select id="personalTypeSelect" class="w-full p-3">
                 <option value="">Selecione o tipo de conteúdo...</option>
-                <!-- lista original mantida -->
                 <option>Flyer de aniversário infantil</option>
                 <option>Flyer de aniversário adulto</option>
                 <option>Convite de aniversário simples</option>
@@ -690,17 +1052,17 @@
                 <option>Banner para status do WhatsApp</option>
                 <option>Flyer para bazar / desapegos</option>
               </select>
-              <input id="personalTypeCustom" type="text" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-indigo-500" placeholder="Ou escreva aqui o tipo de conteúdo desejado">
+              <input id="personalTypeCustom" type="text" class="w-full p-3" placeholder="Ou escreva aqui o tipo de conteúdo desejado">
             </div>
             <p id="personalTypeHint" class="text-xs text-slate-500 mt-2">
               Se não encontrar na lista, escreva no campo ao lado.
             </p>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="card bg-white p-5 space-y-4">
             <div>
               <label class="block text-sm font-bold text-slate-800 mb-2">2. Objetivo</label>
-              <select id="personalObjectiveSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-indigo-500">
+              <select id="personalObjectiveSelect" class="w-full p-3">
                 <option>Compartilhar momento</option>
                 <option>Convidar pessoas</option>
                 <option>Agradecer</option>
@@ -710,14 +1072,14 @@
             </div>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="card bg-white p-5">
             <label class="block text-sm font-bold text-slate-800 mb-2">3. Briefing: O que comunicar?</label>
-            <textarea id="personalBriefingInput" class="w-full border border-slate-300 rounded-2xl p-4 bg-white shadow-sm focus:border-indigo-500" rows="5" placeholder="Ex: Convite de aniversário de 15 anos da Marilidia, tema vermelho com dourado, data, horário e local."></textarea>
+            <textarea id="personalBriefingInput" class="w-full p-4" rows="5" placeholder="Ex: Convite de aniversário de 15 anos da Marilidia, tema vermelho com dourado, data, horário e local."></textarea>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="card bg-white p-5">
             <label class="block text-sm font-bold text-slate-800 mb-2">4. Imagens de Referência (Opcional)</label>
-            <div class="p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-center hover:bg-slate-100 transition cursor-pointer relative group">
+            <div class="p-4 dropzone text-center relative group">
               <input type="file" id="personalReferenceImages" name="personalReferenceImages" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
               <div class="pointer-events-none group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 mb-2"></i>
@@ -740,7 +1102,7 @@
             </div>
           </div>
 
-          <button type="button" onclick="generatePersonalPost()" class="w-full bg-purple-600 text-white p-4 rounded-2xl hover:bg-purple-700 font-bold mt-2 shadow-sm transition transform hover:-translate-y-0.5">
+          <button type="button" onclick="generatePersonalPost()" class="w-full btn-accent justify-center mt-2 text-sm sm:text-base">
             🌟 Gerar Conteúdo Pessoal
           </button>
 
@@ -750,7 +1112,7 @@
         </div>
 
         <div class="w-full xl:w-1/2">
-          <div id="personalResultArea" class="bg-white h-full p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center">
+          <div id="personalResultArea" class="card bg-white h-full p-8 flex flex-col justify-center items-center text-center">
             <div class="text-slate-400">
               <div class="w-14 h-14 rounded-3xl bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto mb-4">
                 <i class="fa-solid fa-heart text-2xl"></i>
@@ -762,15 +1124,15 @@
             </div>
           </div>
 
-          <div id="personalFinalContent" class="hidden bg-white h-full p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div id="personalFinalContent" class="hidden card bg-white h-full p-6">
             <div class="flex flex-wrap justify-between items-center gap-2 mb-4 border-b border-slate-200 pb-3">
               <h3 class="font-bold text-slate-800">Resultado gerado (pessoal)</h3>
               <div class="flex gap-2">
-                <button type="button" onclick="copyCaptionPersonal()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
-                  <i class="fa-solid fa-copy"></i> Copiar legenda
+                <button type="button" onclick="copyCaptionPersonal()" class="btn-ghost">
+                  <i class="fa-solid fa-copy mr-1"></i> Copiar legenda
                 </button>
-                <button type="button" onclick="downloadImagePersonal()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
-                  <i class="fa-solid fa-download"></i> Baixar imagem
+                <button type="button" onclick="downloadImagePersonal()" class="btn-ghost">
+                  <i class="fa-solid fa-download mr-1"></i> Baixar imagem
                 </button>
               </div>
             </div>
@@ -785,13 +1147,13 @@
                 <pre id="personalCaptionOutput" class="whitespace-pre-wrap text-sm leading-relaxed text-slate-800"></pre>
 
                 <div class="flex flex-wrap gap-2 mt-4 border-t border-slate-200 pt-3">
-                  <button type="button" onclick="variantPersonal('short')" class="text-xs border border-purple-200 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-50 transition">
+                  <button type="button" onclick="variantPersonal('short')" class="btn-ghost text-purple-600 border-purple-200">
                     🔄 Mais Curto
                   </button>
-                  <button type="button" onclick="variantPersonal('formal')" class="text-xs border border-purple-200 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-50 transition">
+                  <button type="button" onclick="variantPersonal('formal')" class="btn-ghost text-purple-600 border-purple-200">
                     👔 Mais Formal
                   </button>
-                  <button type="button" onclick="variantPersonal('persuasive')" class="text-xs border border-purple-200 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-50 transition">
+                  <button type="button" onclick="variantPersonal('persuasive')" class="btn-ghost text-purple-600 border-purple-200">
                     🔥 Mais Persuasivo
                   </button>
                 </div>
@@ -802,7 +1164,6 @@
       </div>
     </section>
 
-    <!-- CRIAÇÃO COMERCIAL -->
     <section id="create" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -822,30 +1183,30 @@
 
       <div class="flex flex-col xl:flex-row gap-8">
         <div class="w-full xl:w-1/2 space-y-6">
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="card bg-white p-5">
             <label class="block text-sm font-bold text-slate-800 mb-2">1. Selecione a Marca</label>
-            <select id="createBrandSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-indigo-500"></select>
+            <select id="createBrandSelect" class="w-full p-3"></select>
             <p id="brandHint" class="text-xs text-slate-500 mt-2">Cadastre uma marca para personalizar.</p>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="card bg-white p-5 space-y-4">
             <div>
               <label class="block text-sm font-bold text-slate-800 mb-2">2. Tipo de Conteúdo</label>
               <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="instagram">
-                  <i class="fa-brands fa-instagram"></i> Post Instagram
+                <button type="button" class="content-type-btn p-3 text-xs font-semibold text-slate-700" data-content="instagram">
+                  <i class="fa-brands fa-instagram mr-1"></i> Post Instagram
                 </button>
-                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="facebook">
-                  <i class="fa-brands fa-facebook"></i> Post Facebook
+                <button type="button" class="content-type-btn p-3 text-xs font-semibold text-slate-700" data-content="facebook">
+                  <i class="fa-brands fa-facebook mr-1"></i> Post Facebook
                 </button>
-                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="site">
-                  <i class="fa-solid fa-globe"></i> Para Site
+                <button type="button" class="content-type-btn p-3 text-xs font-semibold text-slate-700" data-content="site">
+                  <i class="fa-solid fa-globe mr-1"></i> Para Site
                 </button>
-                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="video">
-                  <i class="fa-solid fa-video"></i> Roteiro Vídeo
+                <button type="button" class="content-type-btn p-3 text-xs font-semibold text-slate-700" data-content="video">
+                  <i class="fa-solid fa-video mr-1"></i> Roteiro Vídeo
                 </button>
-                <button type="button" class="content-type-btn p-3 text-xs border border-slate-200 rounded-2xl hover:bg-blue-50 hover:border-blue-300 font-semibold text-slate-700" data-content="copy">
-                  <i class="fa-solid fa-bullseye"></i> Copy Vendas
+                <button type="button" class="content-type-btn p-3 text-xs font-semibold text-slate-700" data-content="copy">
+                  <i class="fa-solid fa-bullseye mr-1"></i> Copy Vendas
                 </button>
               </div>
               <p id="typeHint" class="text-xs text-slate-500 mt-2">Selecione um tipo para continuar.</p>
@@ -853,7 +1214,7 @@
 
             <div>
               <label class="block text-sm font-bold text-slate-800 mb-2">3. Objetivo</label>
-              <select id="objectiveSelect" class="w-full p-3 border border-slate-300 rounded-2xl bg-white shadow-sm focus:border-indigo-500">
+              <select id="objectiveSelect" class="w-full p-3">
                 <option>Vender</option>
                 <option>Engajar</option>
                 <option>Educar</option>
@@ -861,14 +1222,14 @@
             </div>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="card bg-white p-5">
             <label class="block text-sm font-bold text-slate-800 mb-2">3. Briefing: O que comunicar?</label>
-            <textarea id="briefingInput" class="w-full border border-slate-300 rounded-2xl p-4 bg-white shadow-sm focus:border-indigo-500" rows="5" placeholder="Ex: Divulgar promoção de final de semana, explicar o benefício principal, destacar um diferencial, etc."></textarea>
+            <textarea id="briefingInput" class="w-full p-4" rows="5" placeholder="Ex: Divulgar promoção de final de semana, explicar o benefício principal, destacar um diferencial, etc."></textarea>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="card bg-white p-5">
             <label class="block text-sm font-bold text-slate-800 mb-2">4. Imagens de Referência (Opcional)</label>
-            <div class="p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 text-center hover:bg-slate-100 transition cursor-pointer relative group">
+            <div class="p-4 dropzone text-center relative group">
               <input type="file" id="referenceImages" name="referenceImages" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
               <div class="pointer-events-none group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 mb-2"></i>
@@ -891,7 +1252,7 @@
             </div>
           </div>
 
-          <button type="button" onclick="generatePostComplete()" class="w-full bg-indigo-600 text-white p-4 rounded-2xl hover:bg-indigo-700 font-bold mt-2 shadow-sm transition transform hover:-translate-y-0.5">
+          <button type="button" onclick="generatePostComplete()" class="w-full btn-accent justify-center mt-2 text-sm sm:text-base">
             ✨ Gerar Conteúdo Estratégico
           </button>
 
@@ -901,7 +1262,7 @@
         </div>
 
         <div class="w-full xl:w-1/2">
-          <div id="resultArea" class="bg-white h-full p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center">
+          <div id="resultArea" class="card bg-white h-full p-8 flex flex-col justify-center items-center text-center">
             <div class="text-slate-400">
               <div class="w-14 h-14 rounded-3xl bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto mb-4">
                 <i class="fa-solid fa-robot text-2xl"></i>
@@ -911,15 +1272,15 @@
             </div>
           </div>
 
-          <div id="finalContent" class="hidden bg-white h-full p-6 rounded-2xl shadow-sm border border-slate-200">
+          <div id="finalContent" class="hidden card bg-white h-full p-6">
             <div class="flex flex-wrap justify-between items-center gap-2 mb-4 border-b border-slate-200 pb-3">
               <h3 class="font-bold text-slate-800">Resultado gerado</h3>
               <div class="flex gap-2">
-                <button type="button" onclick="copyCaption()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
-                  <i class="fa-solid fa-copy"></i> Copiar legenda
+                <button type="button" onclick="copyCaption()" class="btn-ghost">
+                  <i class="fa-solid fa-copy mr-1"></i> Copiar legenda
                 </button>
-                <button type="button" onclick="downloadImage()" class="text-xs bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl hover:bg-slate-100">
-                  <i class="fa-solid fa-download"></i> Baixar imagem
+                <button type="button" onclick="downloadImage()" class="btn-ghost">
+                  <i class="fa-solid fa-download mr-1"></i> Baixar imagem
                 </button>
               </div>
             </div>
@@ -935,13 +1296,13 @@
               </div>
 
               <div class="flex flex-wrap gap-2">
-                <button type="button" onclick="variant('short')" class="text-xs border border-blue-200 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-50">
+                <button type="button" onclick="variant('short')" class="btn-ghost text-blue-600 border-blue-200">
                   🔄 Mais Curto
                 </button>
-                <button type="button" onclick="variant('formal')" class="text-xs border border-blue-200 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-50">
+                <button type="button" onclick="variant('formal')" class="btn-ghost text-blue-600 border-blue-200">
                   👔 Mais Formal
                 </button>
-                <button type="button" onclick="variant('persuasive')" class="text-xs border border-blue-200 text-blue-600 px-3 py-2 rounded-full hover:bg-blue-50">
+                <button type="button" onclick="variant('persuasive')" class="btn-ghost text-blue-600 border-blue-200">
                   🔥 Mais Persuasivo
                 </button>
               </div>
@@ -951,7 +1312,6 @@
       </div>
     </section>
 
-    <!-- PERFIL -->
     <section id="profile" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -969,7 +1329,7 @@
         </button>
       </div>
 
-      <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 max-w-xl">
+      <div class="card bg-white p-6 sm:p-8 max-w-xl">
         <div class="space-y-5">
           <div class="flex items-center gap-4 mb-4">
             <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl font-bold border border-slate-200">
@@ -986,7 +1346,7 @@
             <input
               id="profileNameInput"
               type="text"
-              class="w-full p-3 rounded-2xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              class="w-full p-3"
               placeholder="Seu nome completo"
             />
           </div>
@@ -996,7 +1356,7 @@
             <input
               id="profileEmailInput"
               type="email"
-              class="w-full p-3 rounded-2xl border border-slate-200 bg-slate-100 text-slate-500 cursor-not-allowed"
+              class="w-full p-3 bg-slate-100 text-slate-500 cursor-not-allowed"
               disabled
               placeholder="email@exemplo.com"
             />
@@ -1006,9 +1366,9 @@
           <div class="pt-2">
             <button
               onclick="saveUserProfile()"
-              class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md transition transform hover:scale-105"
+              class="btn-accent"
             >
-              <i class="fa-solid fa-check mr-2"></i> Salvar alterações
+              <i class="fa-solid fa-check mr-1"></i> Salvar alterações
             </button>
           </div>
 
@@ -1016,7 +1376,6 @@
       </div>
     </section>
 
-    <!-- ASSINATURA -->
     <section id="billing" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -1035,7 +1394,44 @@
       </div>
 
       <div class="max-w-2xl space-y-6">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
+
+        <div class="card bg-white p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wide">
+                Período de teste Free
+              </p>
+              <p class="text-sm text-slate-800 mt-1">
+                Novos usuários têm <strong>5 dias gratuitos</strong> para testar o painel.
+              </p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Teste ativo
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-[11px] text-slate-500">
+              <span>Progresso do teste</span>
+              <span id="billingTrialLabel">Calculando…</span>
+            </div>
+            <div class="progress-shell">
+              <div id="billingTrialProgress" class="progress-bar"></div>
+            </div>
+          </div>
+
+          <p id="billingTrialInfo" class="text-xs text-slate-600">
+            Você ainda tem <strong>5 dias de teste gratuito</strong>. Aproveite para gerar conteúdos,
+            cadastrar marcas e sentir se o NexoraAI faz sentido para o seu dia a dia.
+          </p>
+
+          <p class="text-[11px] text-slate-400">
+            Após o fim do período de teste, para continuar usando o painel sem limitações,
+            basta assinar o plano <strong>Pro</strong> por <strong>R$ 49,90/mês</strong>.
+          </p>
+        </div>
+
+        <div class="card bg-white p-6 flex flex-col gap-3">
           <div class="flex items-center justify-between gap-4">
             <div>
               <p class="text-sm font-medium text-slate-800">Plano atual</p>
@@ -1060,7 +1456,7 @@
           </button>
         </div>
 
-        <div class="bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-6 rounded-2xl shadow-sm border border-slate-200/0">
+        <div class="feature-panel bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-6 border border-slate-200/0">
           <h3 class="font-semibold mb-2">NexoraAI Pro – R$ 49,90/mês</h3>
           <ul class="text-sm space-y-1 opacity-95 mb-4">
             <li>• Geração ilimitada dentro do uso justo</li>
@@ -1070,7 +1466,7 @@
           <button
             type="button"
             id="btnBillingCheckout"
-            class="inline-flex items-center justify-center rounded-2xl bg-white/95 text-indigo-700 px-4 py-2.5 text-sm font-semibold hover:bg-white transition"
+            class="btn-accent bg-white text-indigo-800"
           >
             Assinar / Gerenciar plano
           </button>
@@ -1082,7 +1478,6 @@
     </section>
   </main>
 
-  <!-- Funções globais -->
   <script>
     function goBackToDashboard() {
       const el = document.querySelector('[data-section="dashboard"]');
@@ -1090,7 +1485,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 🔹 FUNÇÃO PARA MOBILE: abre a seção "Meu Perfil" via botão de engrenagem no header
     function openProfileFromMobile() {
       const profileMenuItem = document.querySelector('[data-section="profile"]');
       if (profileMenuItem) {
@@ -1098,6 +1492,68 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
+
+    // 🔹 Lógica do Período de Teste (Com redirecionamento automático)
+    (function initTrialBanner() {
+      const TRIAL_DAYS = 5;
+
+      const infoEl = document.getElementById('billingTrialInfo');
+      const labelEl = document.getElementById('billingTrialLabel');
+      const barEl  = document.getElementById('billingTrialProgress');
+
+      if (!infoEl || !labelEl || !barEl) return;
+
+      // Salva a data do primeiro acesso
+      let stored = localStorage.getItem('nexora_trial_start');
+      if (!stored) {
+        stored = new Date().toISOString();
+        localStorage.setItem('nexora_trial_start', stored);
+      }
+
+      const startDate = new Date(stored);
+      const now = new Date();
+      const diffMs = now - startDate;
+
+      const usedDays = Math.min(
+        TRIAL_DAYS,
+        Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
+      );
+
+      const remaining = Math.max(0, TRIAL_DAYS - usedDays);
+      const percent = (usedDays / TRIAL_DAYS) * 100;
+
+      barEl.style.width = `${Math.max(5, Math.min(100, percent || 5))}%`;
+
+      // Enquanto ainda tem dias
+      if (remaining > 0) {
+        labelEl.textContent = `${usedDays}/${TRIAL_DAYS} dias usados`;
+        infoEl.innerHTML =
+          `Você ainda tem <strong>${remaining} dia${remaining > 1 ? 's' : ''}</strong> de teste gratuito. `;
+        return;
+      }
+
+      // 🔥🔥🔥 TESTE ACABOU 🔥🔥🔥
+      labelEl.textContent = `5/5 dias usados`;
+      infoEl.innerHTML =
+        `Seu período de teste gratuito terminou. Para continuar utilizando o NexoraAI, ` +
+        `assine o <strong>Plano Pro</strong>. Você será redirecionado automaticamente…`;
+
+      // Aguarda 3 segundos e redireciona
+      setTimeout(() => {
+
+        //////////////////////////////////////////
+        // 🔽 ESCOLHA 1 → Redirecionar para a página de ASSINATURA dentro do painel
+        //////////////////////////////////////////
+        const billingMenu = document.querySelector('[data-section="billing"]');
+        if (billingMenu) billingMenu.click();
+        
+        //////////////////////////////////////////
+        // 🔽 ESCOLHA 2 → Redirecionar para checkout externo (DESCOMENTE se quiser)
+        //////////////////////////////////////////
+        // window.location.href = "https://sualinkdecheckout.com";
+        
+      }, 3000);
+    })();
   </script>
 
   <script src="./js/nexoraai-panel.js"></script>
