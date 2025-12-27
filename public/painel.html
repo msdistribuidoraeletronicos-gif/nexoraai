@@ -15,7 +15,7 @@
 
   <style>
     :root {
-      /* Paleta 60-30-10 */
+      /* 60-30-10 */
       --page-bg: #f4f5fb;           /* 60% – fundo neutro geral */
       --shell-bg: #ffffff;          /* cartões / caixas principais */
       --shell-subtle: #e5e7eb;      /* divisórias suaves */
@@ -60,7 +60,7 @@
       letter-spacing: -0.03em;
     }
 
-    /* Affordance: tudo que é clicável "parece clicável" */
+    /* Affordance forte: tudo que é clicável parece clicável */
     button,
     [role="button"],
     .sidebar-item,
@@ -83,7 +83,7 @@
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.20);
     }
 
-    /* Campos de formulário claros e "convidativos" */
+    /* Campos com cara de “escreva aqui” */
     input[type="text"],
     input[type="email"],
     input[type="password"],
@@ -107,7 +107,6 @@
       background-color: #f9fafb;
     }
 
-    /* Placeholder mais suave */
     ::placeholder {
       color: #9ca3af;
     }
@@ -129,14 +128,13 @@
       background: radial-gradient(circle at top left, #ffffff, #f9fafb);
     }
 
-    /* KPI number – bem visível, fácil de "bater o olho" */
     .kpi-number {
       font-size: 2.4rem;
       line-height: 1;
     }
 
     /* ===========================
-       SIDEBAR (Lei de Jakob + 30%)
+       SIDEBAR DESKTOP
     ============================ */
     .sidebar-desktop-only {
       background: radial-gradient(circle at 0% 0%, var(--nav-bg-2), var(--nav-bg-1));
@@ -189,7 +187,6 @@
       border: 1px solid rgba(148, 163, 184, 0.4);
     }
 
-    /* Avatar / inicial do usuário mais "app moderno" */
     .user-avatar {
       background: conic-gradient(from 210deg, #4f46e5, #6366f1, #ec4899, #f97316, #22c55e, #4f46e5);
       padding: 1px;
@@ -202,7 +199,7 @@
     }
 
     /* ===========================
-       BOTÕES – Regras 60-30-10 + Von Restorff
+       BOTÕES (Von Restorff)
     ============================ */
     .btn-accent {
       background: linear-gradient(135deg, var(--accent), var(--accent-strong));
@@ -254,7 +251,6 @@
       transform: translateY(-1px);
     }
 
-    /* Botões de tipo de conteúdo (affordance forte) */
     .content-type-btn {
       border-radius: 999px;
       background: #f9fafb;
@@ -275,7 +271,7 @@
     }
 
     /* ===========================
-       PREVIEW / RESULTADOS (Skeleton + micro-interações)
+       PREVIEW / RESULTADOS
     ============================ */
     .preview-container {
       border-radius: 1.5rem;
@@ -302,7 +298,7 @@
       box-shadow: var(--shadow-strong);
     }
 
-    /* Skeleton screens – Performance percebida */
+    /* Skeleton */
     @keyframes skeletonPulse {
       0% { background-position: -200px 0; }
       100% { background-position: 200px 0; }
@@ -319,15 +315,12 @@
       border-radius: 1rem;
     }
 
-    /* Exemplo de skeleton aplicável em áreas de texto (quando JS quiser) */
     .skeleton-text {
       height: 0.7rem;
       margin-bottom: 0.45rem;
     }
 
-    /* ===========================
-       API Status pill
-    ============================ */
+    /* API Status pill */
     #apiStatus {
       font-size: 0.7rem;
       border-radius: 999px;
@@ -337,20 +330,16 @@
       color: #e5e7eb;
     }
 
-    /* ===========================
-       HEADER / MOBILE USER BAR
-    ============================ */
+    /* HEADER */
     header {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(18px);
     }
 
-    /* Barra superior – texto mais leve */
     header h2 {
       letter-spacing: -0.02em;
     }
 
-    /* Barra mobile – "chip" de usuário */
     .mobile-user-chip {
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.45);
@@ -358,10 +347,7 @@
       background: rgba(255, 255, 255, 0.98);
     }
 
-    /* ===========================
-       BARRA DE PROGRESSO (Zeigarnik)
-       – pode ser usada para perfil / onboarding
-    ============================ */
+    /* BARRA DE PROGRESSO */
     .progress-shell {
       width: 100%;
       border-radius: 999px;
@@ -374,13 +360,11 @@
       height: 100%;
       border-radius: 999px;
       background: linear-gradient(90deg, #22c55e, #16a34a);
-      width: 60%; /* valor inicial, JS pode alterar depois */
+      width: 60%;
       box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.4);
     }
 
-    /* ===========================
-       SEÇÕES / LAYOUT
-    ============================ */
+    /* SEÇÕES / LAYOUT */
     main {
       background: var(--page-bg);
     }
@@ -389,7 +373,6 @@
       scroll-margin-top: 80px;
     }
 
-    /* Campos de dropzone de imagens com affordance forte */
     .dropzone {
       border-radius: 1.25rem;
       border-style: dashed;
@@ -405,7 +388,6 @@
       transform: translateY(-1px);
     }
 
-    /* Painéis de instrução / dicas */
     .hint-box {
       border-radius: 1rem;
       background: #eff6ff;
@@ -415,7 +397,6 @@
       color: #1e3a8a;
     }
 
-    /* Painéis de destaque (Sugestão automática, plano Pro, etc.) */
     .feature-panel {
       border-radius: 1.5rem;
       box-shadow: var(--shadow-soft);
@@ -431,7 +412,51 @@
       pointer-events: none;
     }
 
-    /* Responsividade: sidebar some em telas menores */
+    /* Step pills – Progressive Disclosure visual */
+    .steps-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.7rem;
+    }
+
+    .step-pill {
+      border-radius: 999px;
+      padding: 0.25rem 0.7rem;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      background: #f9fafb;
+      color: #6b7280;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .step-pill strong {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .step-pill-active {
+      border-style: solid;
+      border-color: #4f46e5;
+      background: #eef2ff;
+      color: #111827;
+    }
+
+    /* Bottom nav micro-interactions */
+    .nav-mobile-btn {
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+
+    .nav-mobile-btn span:first-child {
+      transition: transform 0.12s ease, box-shadow 0.15s ease;
+    }
+
+    .nav-mobile-btn:active span:first-child {
+      transform: scale(0.9);
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.6);
+    }
+
     @media (max-width: 1023.98px) {
       .sidebar-desktop-only {
         display: none !important;
@@ -442,12 +467,14 @@
 
 <body class="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-900">
 
+  <!-- SIDEBAR DESKTOP -->
   <aside class="hidden lg:flex lg:w-72 text-slate-300 flex-col relative z-50 flex-shrink-0 sidebar-desktop-only">
     <div class="p-4 sm:p-6 border-b border-slate-800/70">
       <button
         type="button"
         onclick="goBackToDashboard()"
         class="flex items-center gap-3 w-full text-left focus:outline-none"
+        aria-label="Voltar para o Dashboard"
       >
         <div class="user-avatar w-10 h-10 rounded-2xl flex items-center justify-center">
           <div class="user-avatar-inner w-full h-full flex items-center justify-center border border-indigo-500/40">
@@ -620,7 +647,8 @@
     </div>
   </aside>
 
-  <main class="flex-1 flex flex-col overflow-y-auto relative">
+  <!-- MAIN -->
+  <main class="flex-1 flex flex-col overflow-y-auto relative pb-20 lg:pb-0">
     <header class="sticky top-0 z-20 border-b border-slate-200/70">
       <div class="px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between gap-4">
         <div>
@@ -633,6 +661,7 @@
         </button>
       </div>
 
+      <!-- Barra de usuário mobile -->
       <div class="px-4 sm:px-8 pb-3 flex items-center justify-between gap-3 lg:hidden">
         <div class="flex items-center gap-3 mobile-user-chip">
           <div class="user-avatar w-8 h-8 rounded-2xl flex items-center justify-center">
@@ -656,58 +685,13 @@
       </div>
     </header>
 
+    <!-- DASHBOARD -->
     <section id="dashboard" class="p-4 sm:p-6 lg:p-8">
       <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-bold text-slate-900">Painel Central</h2>
           <p class="text-sm text-slate-600">Resumo de performance e próximos passos.</p>
         </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 mb-6 lg:hidden">
-        <button
-          type="button"
-          onclick='document.querySelector("[data-section=dashboard]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
-        >
-          <div class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center mb-2">
-            <i class="fa-solid fa-chart-pie text-slate-700 text-sm"></i>
-          </div>
-          Dashboard
-        </button>
-
-        <button
-          type="button"
-          onclick='document.querySelector("[data-section=create-mode]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
-        >
-          <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-2">
-            <i class="fa-solid fa-pen-nib text-indigo-600 text-sm"></i>
-          </div>
-          Criar Conteúdo
-        </button>
-
-        <button
-          type="button"
-          onclick='document.querySelector("[data-section=brands]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
-        >
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-2">
-            <i class="fa-solid fa-briefcase text-emerald-600 text-sm"></i>
-          </div>
-          Minhas Marcas
-        </button>
-
-        <button
-          type="button"
-          onclick='document.querySelector("[data-section=history]").click()'
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 py-3 px-2 flex flex-col items-center justify-center text-center text-xs font-semibold text-slate-700 card-clickable"
-        >
-          <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center mb-2">
-            <i class="fa-solid fa-clock-rotate-left text-purple-600 text-sm"></i>
-          </div>
-          Histórico
-        </button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
@@ -782,6 +766,7 @@
       </div>
     </section>
 
+    <!-- MINHAS MARCAS -->
     <section id="brands" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -799,50 +784,72 @@
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div class="card bg-white p-6">
-          <div class="flex items-center justify-between gap-4 border-b pb-4 mb-5 border-slate-200">
-            <h3 class="text-lg font-semibold text-slate-900">
-              <span class="text-indigo-600">Cadastrar</span> nova marca
-            </h3>
+          <div class="flex items-center justify-between gap-4 border-b pb-4 mb-4 border-slate-200">
+            <div>
+              <h3 class="text-lg font-semibold text-slate-900">
+                <span class="text-indigo-600">Cadastrar</span> nova marca
+              </h3>
+              <p class="text-xs text-slate-500 mt-1">Complete as informações em 3 passos.</p>
+            </div>
             <span class="text-xs text-slate-500 bg-slate-50 border border-slate-200 px-3 py-1 rounded-full">
               Configuração estratégica
             </span>
           </div>
 
+          <div class="steps-row mb-4">
+            <div class="step-pill step-pill-active">
+              <strong>Passo 1</strong> Dados básicos
+            </div>
+            <div class="step-pill">
+              <strong>Passo 2</strong> Público e tom
+            </div>
+            <div class="step-pill">
+              <strong>Passo 3</strong> Objetivo da comunicação
+            </div>
+          </div>
+
           <form id="brandForm" class="space-y-4" onsubmit="return false;">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700">Nome da Marca</label>
-                <input id="brandName" type="text" class="mt-1 block w-full p-3" placeholder="Ex: Restaurante Marineis">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700">Nicho / Segmento</label>
-                <input id="brandNiche" type="text" class="mt-1 block w-full p-3" placeholder="Ex: Restaurante, Loja de Roupas...">
+            <div>
+              <p class="text-xs text-slate-500 mb-1">Passo 1 de 3</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700">Nome da Marca</label>
+                  <input id="brandName" type="text" class="mt-1 block w-full p-3" placeholder="Ex: Restaurante Marineis">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700">Nicho / Segmento</label>
+                  <input id="brandNiche" type="text" class="mt-1 block w-full p-3" placeholder="Ex: Restaurante, Loja de Roupas...">
+                </div>
               </div>
             </div>
 
             <div>
+              <p class="text-xs text-slate-500 mb-1">Passo 2 de 3</p>
               <label class="block text-sm font-medium text-slate-700">Público-alvo</label>
               <textarea id="brandAudience" class="mt-1 block w-full p-3" rows="3" placeholder="Ex: Famílias da região, classe média..."></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700">Tom de Voz</label>
-                <select id="brandTone" class="mt-1 block w-full p-3">
-                  <option>Profissional</option>
-                  <option>Informal</option>
-                  <option>Autoridade</option>
-                  <option>Humanizado</option>
-                  <option>Persuasivo</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700">Objetivo Principal</label>
-                <select id="brandGoal" class="mt-1 block w-full p-3">
-                  <option>Vender</option>
-                  <option>Gerar Autoridade</option>
-                  <option>Engajar</option>
-                </select>
+            <div>
+              <p class="text-xs text-slate-500 mb-1">Passo 3 de 3</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700">Tom de Voz</label>
+                  <select id="brandTone" class="mt-1 block w-full p-3">
+                    <option>Profissional</option>
+                    <option>Informal</option>
+                    <option>Autoridade</option>
+                    <option>Humanizado</option>
+                    <option>Persuasivo</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700">Objetivo Principal</label>
+                  <select id="brandGoal" class="mt-1 block w-full p-3">
+                    <option>Vender</option>
+                    <option>Gerar Autoridade</option>
+                    <option>Engajar</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -866,6 +873,7 @@
       </div>
     </section>
 
+    <!-- SUGESTÕES -->
     <section id="templates" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -901,6 +909,7 @@
       </div>
     </section>
 
+    <!-- HISTÓRICO -->
     <section id="history" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -929,6 +938,7 @@
       </div>
     </section>
 
+    <!-- CRIAR CONTEÚDO (ESCOLHA TIPO) -->
     <section id="create-mode" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -977,6 +987,7 @@
       </div>
     </section>
 
+    <!-- CRIAR CONTEÚDO PESSOAL -->
     <section id="create-personal" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -997,10 +1008,14 @@
       <div class="flex flex-col xl:flex-row gap-8">
         <div class="w-full xl:w-1/2 space-y-6">
           <div class="card bg-white p-5">
-            <label class="block text-sm font-bold text-slate-800 mb-2">1. Tipo de conteúdo pessoal</label>
+            <div class="flex items-center justify-between mb-3">
+              <label class="block text-sm font-bold text-slate-800">1. Tipo de conteúdo pessoal</label>
+              <span class="text-[11px] text-slate-500">Passo 1 de 4</span>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <select id="personalTypeSelect" class="w-full p-3">
                 <option value="">Selecione o tipo de conteúdo...</option>
+                <!-- opções mantidas -->
                 <option>Flyer de aniversário infantil</option>
                 <option>Flyer de aniversário adulto</option>
                 <option>Convite de aniversário simples</option>
@@ -1060,8 +1075,11 @@
           </div>
 
           <div class="card bg-white p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-bold text-slate-800">2. Objetivo</label>
+              <span class="text-[11px] text-slate-500">Passo 2 de 4</span>
+            </div>
             <div>
-              <label class="block text-sm font-bold text-slate-800 mb-2">2. Objetivo</label>
               <select id="personalObjectiveSelect" class="w-full p-3">
                 <option>Compartilhar momento</option>
                 <option>Convidar pessoas</option>
@@ -1073,12 +1091,18 @@
           </div>
 
           <div class="card bg-white p-5">
-            <label class="block text-sm font-bold text-slate-800 mb-2">3. Briefing: O que comunicar?</label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-bold text-slate-800">3. Briefing: O que comunicar?</label>
+              <span class="text-[11px] text-slate-500">Passo 3 de 4</span>
+            </div>
             <textarea id="personalBriefingInput" class="w-full p-4" rows="5" placeholder="Ex: Convite de aniversário de 15 anos da Marilidia, tema vermelho com dourado, data, horário e local."></textarea>
           </div>
 
           <div class="card bg-white p-5">
-            <label class="block text-sm font-bold text-slate-800 mb-2">4. Imagens de Referência (Opcional)</label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-bold text-slate-800">4. Imagens de Referência (Opcional)</label>
+              <span class="text-[11px] text-slate-500">Passo 4 de 4</span>
+            </div>
             <div class="p-4 dropzone text-center relative group">
               <input type="file" id="personalReferenceImages" name="personalReferenceImages" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
               <div class="pointer-events-none group-hover:scale-105 transition-transform">
@@ -1164,6 +1188,7 @@
       </div>
     </section>
 
+    <!-- CRIAR CONTEÚDO COMERCIAL -->
     <section id="create" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -1184,14 +1209,20 @@
       <div class="flex flex-col xl:flex-row gap-8">
         <div class="w-full xl:w-1/2 space-y-6">
           <div class="card bg-white p-5">
-            <label class="block text-sm font-bold text-slate-800 mb-2">1. Selecione a Marca</label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-bold text-slate-800">1. Selecione a Marca</label>
+              <span class="text-[11px] text-slate-500">Passo 1 de 4</span>
+            </div>
             <select id="createBrandSelect" class="w-full p-3"></select>
             <p id="brandHint" class="text-xs text-slate-500 mt-2">Cadastre uma marca para personalizar.</p>
           </div>
 
           <div class="card bg-white p-5 space-y-4">
             <div>
-              <label class="block text-sm font-bold text-slate-800 mb-2">2. Tipo de Conteúdo</label>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-sm font-bold text-slate-800">2. Tipo de Conteúdo</label>
+                <span class="text-[11px] text-slate-500">Passo 2 de 4</span>
+              </div>
               <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                 <button type="button" class="content-type-btn p-3 text-xs font-semibold text-slate-700" data-content="instagram">
                   <i class="fa-brands fa-instagram mr-1"></i> Post Instagram
@@ -1213,7 +1244,10 @@
             </div>
 
             <div>
-              <label class="block text-sm font-bold text-slate-800 mb-2">3. Objetivo</label>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-sm font-bold text-slate-800">3. Objetivo</label>
+                <span class="text-[11px] text-slate-500">Passo 3 de 4</span>
+              </div>
               <select id="objectiveSelect" class="w-full p-3">
                 <option>Vender</option>
                 <option>Engajar</option>
@@ -1223,7 +1257,10 @@
           </div>
 
           <div class="card bg-white p-5">
-            <label class="block text-sm font-bold text-slate-800 mb-2">3. Briefing: O que comunicar?</label>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-bold text-slate-800">3. Briefing: O que comunicar?</label>
+              <span class="text-[11px] text-slate-500">Passo 4 de 4</span>
+            </div>
             <textarea id="briefingInput" class="w-full p-4" rows="5" placeholder="Ex: Divulgar promoção de final de semana, explicar o benefício principal, destacar um diferencial, etc."></textarea>
           </div>
 
@@ -1312,6 +1349,7 @@
       </div>
     </section>
 
+    <!-- PERFIL -->
     <section id="profile" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -1331,13 +1369,22 @@
 
       <div class="card bg-white p-6 sm:p-8 max-w-xl">
         <div class="space-y-5">
-          <div class="flex items-center gap-4 mb-4">
-            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl font-bold border border-slate-200">
-              <i class="fa-solid fa-user"></i>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-2xl font-bold border border-slate-200">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-slate-900">Avatar do usuário</p>
+                <p class="text-xs text-slate-500">Gerado automaticamente pelo sistema</p>
+              </div>
             </div>
-            <div>
-              <p class="text-sm font-medium text-slate-900">Avatar do usuário</p>
-              <p class="text-xs text-slate-500">Gerado automaticamente pelo sistema</p>
+            <div class="hidden sm:flex flex-col items-end gap-1">
+              <span class="text-[11px] text-slate-500">Perfil</span>
+              <div class="w-24 progress-shell">
+                <div class="progress-bar" style="width: 60%;"></div>
+              </div>
+              <span class="text-[10px] text-slate-400">Complete seus dados para chegar a 100%</span>
             </div>
           </div>
 
@@ -1363,12 +1410,23 @@
             <p class="text-[11px] text-slate-400 mt-1">O e-mail não pode ser alterado manualmente.</p>
           </div>
 
-          <div class="pt-2">
+          <div class="pt-2 flex flex-col sm:flex-row gap-3">
             <button
               onclick="saveUserProfile()"
               class="btn-accent"
+              type="button"
             >
               <i class="fa-solid fa-check mr-1"></i> Salvar alterações
+            </button>
+
+            <!-- 🔴 NOVO: botão sair da conta dentro da página de Perfil -->
+            <button
+              type="button"
+              onclick="document.getElementById('btnLogout')?.click()"
+              class="inline-flex items-center justify-center rounded-2xl px-4 py-2.5 text-sm font-semibold bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-slate-50"
+            >
+              <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>
+              Sair da conta
             </button>
           </div>
 
@@ -1376,6 +1434,7 @@
       </div>
     </section>
 
+    <!-- ASSINATURA -->
     <section id="billing" class="p-4 sm:p-6 lg:p-8 hidden-section">
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
@@ -1478,6 +1537,83 @@
     </section>
   </main>
 
+  <!-- NAV MOBILE FIXO -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-slate-900/95 border-t border-slate-800/70 backdrop-blur-lg lg:hidden">
+    <div class="max-w-5xl mx-auto px-2 py-1.5 flex items-center justify-between gap-1 text-[10px] text-slate-200">
+
+      <button
+        class="nav-mobile-btn flex-1 flex flex-col items-center gap-1 py-1"
+        onclick='document.querySelector("[data-section=dashboard]").click()'
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800">
+          <i class="fa-solid fa-chart-pie text-xs"></i>
+        </span>
+        <span>Dashboard</span>
+      </button>
+
+      <button
+        class="nav-mobile-btn flex-1 flex flex-col items-center gap-1 py-1"
+        onclick='document.querySelector("[data-section=create-mode]").click()'
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800">
+          <i class="fa-solid fa-pen-nib text-xs"></i>
+        </span>
+        <span>Criar</span>
+      </button>
+
+      <button
+        class="nav-mobile-btn flex-1 flex flex-col items-center gap-1 py-1"
+        onclick='document.querySelector("[data-section=brands]").click()'
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800">
+          <i class="fa-solid fa-briefcase text-xs"></i>
+        </span>
+        <span>Marcas</span>
+      </button>
+
+      <button
+        class="nav-mobile-btn flex-1 flex flex-col items-center gap-1 py-1"
+        onclick='document.querySelector("[data-section=templates]").click()'
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800">
+          <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+        </span>
+        <span>Sugestões</span>
+      </button>
+
+      <button
+        class="nav-mobile-btn flex-1 flex flex-col items-center gap-1 py-1"
+        onclick='document.querySelector("[data-section=history]").click()'
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800">
+          <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+        </span>
+        <span>Histórico</span>
+      </button>
+
+      <button
+        class="nav-mobile-btn flex-1 flex flex-col items-center gap-1 py-1"
+        onclick='document.querySelector("[data-section=profile]").click()'
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800">
+          <i class="fa-regular fa-user text-xs"></i>
+        </span>
+        <span>Perfil</span>
+      </button>
+
+      <button
+        class="nav-mobile-btn flex-1 flex flex-col items-center gap-1 py-1"
+        onclick='document.querySelector("[data-section=billing]").click()'
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-800">
+          <i class="fa-regular fa-credit-card text-xs"></i>
+        </span>
+        <span>Plano</span>
+      </button>
+
+    </div>
+  </nav>
+
   <script>
     function goBackToDashboard() {
       const el = document.querySelector('[data-section="dashboard"]');
@@ -1493,7 +1629,19 @@
       }
     }
 
-    // 🔹 Lógica do Período de Teste (Com redirecionamento automático)
+    // ✅ NOVO: faz a engrenagem do desktop abrir/fechar o painel de usuário
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('userSettingsBtn');
+      const panel = document.getElementById('userProfilePanel');
+      if (btn && panel && !btn.dataset.bound) {
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', () => {
+          panel.classList.toggle('hidden');
+        });
+      }
+    });
+
+    // Lógica do Período de Teste
     (function initTrialBanner() {
       const TRIAL_DAYS = 5;
 
@@ -1503,7 +1651,6 @@
 
       if (!infoEl || !labelEl || !barEl) return;
 
-      // Salva a data do primeiro acesso
       let stored = localStorage.getItem('nexora_trial_start');
       if (!stored) {
         stored = new Date().toISOString();
@@ -1524,7 +1671,6 @@
 
       barEl.style.width = `${Math.max(5, Math.min(100, percent || 5))}%`;
 
-      // Enquanto ainda tem dias
       if (remaining > 0) {
         labelEl.textContent = `${usedDays}/${TRIAL_DAYS} dias usados`;
         infoEl.innerHTML =
@@ -1532,26 +1678,14 @@
         return;
       }
 
-      // 🔥🔥🔥 TESTE ACABOU 🔥🔥🔥
       labelEl.textContent = `5/5 dias usados`;
       infoEl.innerHTML =
         `Seu período de teste gratuito terminou. Para continuar utilizando o NexoraAI, ` +
         `assine o <strong>Plano Pro</strong>. Você será redirecionado automaticamente…`;
 
-      // Aguarda 3 segundos e redireciona
       setTimeout(() => {
-
-        //////////////////////////////////////////
-        // 🔽 ESCOLHA 1 → Redirecionar para a página de ASSINATURA dentro do painel
-        //////////////////////////////////////////
         const billingMenu = document.querySelector('[data-section="billing"]');
         if (billingMenu) billingMenu.click();
-        
-        //////////////////////////////////////////
-        // 🔽 ESCOLHA 2 → Redirecionar para checkout externo (DESCOMENTE se quiser)
-        //////////////////////////////////////////
-        // window.location.href = "https://sualinkdecheckout.com";
-        
       }, 3000);
     })();
   </script>

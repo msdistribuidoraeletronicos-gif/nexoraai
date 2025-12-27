@@ -1,3 +1,37 @@
-node_modules/
+# =========================
+# NODE / BACKEND
+# =========================
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+
+# =========================
+# BUILD / TEMP
+# =========================
+dist
+build
+.tmp
+storage
+
+# =========================
+# CONFIG / SEGREDOS
+# =========================
 .env
-.env.*
+.env.local
+.env.*.local
+
+# =========================
+# LOGS
+# =========================
+*.log
+logs
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# SISTEMA
+# =========================
+.DS_Store
+Thumbs.db
