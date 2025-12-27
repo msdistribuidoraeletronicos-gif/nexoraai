@@ -290,48 +290,79 @@
   </div>
 
   <script>
-    // 👉 Substitua pela sua Public Key do Mercado Pago
-    const MP_PUBLIC_KEY = "SUA_PUBLIC_KEY_MERCADO_PAGO_AQUI"; 
+    // ===============================
+    //  MERCADO PAGO – CONFIG DINÂMICA
+    // ===============================
+    let mp = null;
 
-    const mp = new MercadoPago(MP_PUBLIC_KEY, {
-      locale: 'pt-BR'
-    });
+    async function initMercadoPagoSDK() {
+      const msg = document.getElementById("checkoutMessage");
+      try {
+        const res = await fetch("/api/config/public");
+        if (!res.ok) {
+          console.error("Falha ao carregar config pública:", res.status);
+          msg.textContent = "Não foi possível inicializar o Mercado Pago. Tente novamente mais tarde.";
+          return;
+        }
 
-    const planCards = document.querySelectorAll('.plan-card');
-    const summaryPlanName   = document.getElementById('summaryPlanName');
-    const summaryPlanPeriod = document.getElementById('summaryPlanPeriod');
-    const summaryPlanPrice  = document.getElementById('summaryPlanPrice');
-    const btnCheckout       = document.getElementById('btnCheckout');
-    const checkoutMessage   = document.getElementById('checkoutMessage');
+        const cfg = await res.json();
+        if (!cfg || !cfg.mpPublicKey) {
+          console.error("mpPublicKey ausente na resposta:", cfg);
+          msg.textContent = "Configuração de pagamento indisponível no momento.";
+          return;
+        }
+
+        mp = new MercadoPago(cfg.mpPublicKey, {
+          locale: "pt-BR",
+        });
+
+        console.log("✅ Mercado Pago inicializado no frontend");
+      } catch (e) {
+        console.error("Erro ao inicializar Mercado Pago:", e);
+        if (msg) {
+          msg.textContent = "Não foi possível inicializar o Mercado Pago. Tente novamente.";
+        }
+      }
+    }
+
+    // ===============================
+    //  UI – CONTROLE DE PLANO
+    // ===============================
+    const planCards = document.querySelectorAll(".plan-card");
+    const summaryPlanName   = document.getElementById("summaryPlanName");
+    const summaryPlanPeriod = document.getElementById("summaryPlanPeriod");
+    const summaryPlanPrice  = document.getElementById("summaryPlanPrice");
+    const btnCheckout       = document.getElementById("btnCheckout");
+    const checkoutMessage   = document.getElementById("checkoutMessage");
 
     function updateSummaryFromSelection() {
-      const selected = document.querySelector('.plan-card input:checked');
+      const selected = document.querySelector(".plan-card input:checked");
       if (!selected) return;
 
       const value = selected.value; // quinzenal | mensal
 
-      if (value === 'quinzenal') {
-        summaryPlanName.textContent   = 'Plano Quinzenal';
-        summaryPlanPeriod.textContent = '15 dias';
-        summaryPlanPrice.textContent  = 'R$ 37,00';
+      if (value === "quinzenal") {
+        summaryPlanName.textContent   = "Plano Quinzenal";
+        summaryPlanPeriod.textContent = "15 dias";
+        summaryPlanPrice.textContent  = "R$ 37,00";
       } else {
-        summaryPlanName.textContent   = 'Plano Mensal';
-        summaryPlanPeriod.textContent = '30 dias';
-        summaryPlanPrice.textContent  = 'R$ 68,00';
+        summaryPlanName.textContent   = "Plano Mensal";
+        summaryPlanPeriod.textContent = "30 dias";
+        summaryPlanPrice.textContent  = "R$ 68,00";
       }
 
-      planCards.forEach(card => {
-        if (card.querySelector('input').checked) {
-          card.classList.add('plan-card-selected');
+      planCards.forEach((card) => {
+        if (card.querySelector("input").checked) {
+          card.classList.add("plan-card-selected");
         } else {
-          card.classList.remove('plan-card-selected');
+          card.classList.remove("plan-card-selected");
         }
       });
     }
 
-    planCards.forEach(card => {
-      card.addEventListener('click', () => {
-        const input = card.querySelector('input');
+    planCards.forEach((card) => {
+      card.addEventListener("click", () => {
+        const input = card.querySelector("input");
         input.checked = true;
         updateSummaryFromSelection();
       });
@@ -339,21 +370,25 @@
 
     updateSummaryFromSelection();
 
-    // Pega token de login salvo no localStorage para usar na rota protegida
+    // ===============================
+    //  AUTENTICAÇÃO BÁSICA
+    // ===============================
     function getAuthToken() {
-      try {
-        const raw = localStorage.getItem("nexora_session");
-        if (!raw) return null;
-        const obj = JSON.parse(raw);
-        return obj.token || null;
-      } catch {
-        return null;
-      }
+      return localStorage.getItem("nexoraai_token");
     }
 
-    // 👉 Chama seu backend para criar a preference do Mercado Pago
-    btnCheckout.addEventListener('click', async () => {
-      const selected = document.querySelector('.plan-card input:checked');
+    (function protectCheckout() {
+      const token = getAuthToken();
+      if (!token) {
+        window.location.href = "/";
+      }
+    })();
+
+    // ===============================
+    //  BOTÃO DE PAGAMENTO
+    // ===============================
+    btnCheckout.addEventListener("click", async () => {
+      const selected = document.querySelector(".plan-card input:checked");
       if (!selected) return;
 
       const planType = selected.value; // quinzenal | mensal
@@ -369,39 +404,51 @@
           return;
         }
 
-        const res = await fetch('/api/checkout/preference', {
-          method: 'POST',
+        if (!mp) {
+          checkoutMessage.textContent =
+            "Não foi possível inicializar o Mercado Pago. Atualize a página e tente novamente.";
+          btnCheckout.disabled = false;
+          return;
+        }
+
+        const res = await fetch("/api/checkout/preference", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ planType })
+          body: JSON.stringify({ planType }),
         });
 
         if (!res.ok) {
-          throw new Error('Erro ao criar preferência de pagamento');
+          const errBody = await res.json().catch(() => ({}));
+          console.error("Erro backend /api/checkout/preference:", errBody);
+          throw new Error(errBody?.error || "Erro ao criar preferência de pagamento");
         }
 
-        const data = await res.json(); // { preferenceId }
+        const data = await res.json(); // { ok, preferenceId, initPoint }
         if (!data || !data.preferenceId) {
-          throw new Error('Resposta inválida do servidor');
+          throw new Error("Resposta inválida do servidor");
         }
 
         checkoutMessage.textContent = "Redirecionando para o Mercado Pago...";
-        
+
         mp.checkout({
           preference: {
-            id: data.preferenceId
+            id: data.preferenceId,
           },
           autoOpen: true,
         });
-
       } catch (err) {
         console.error(err);
-        checkoutMessage.textContent = "Não foi possível criar o pagamento. Tente novamente ou fale com o suporte.";
+        checkoutMessage.textContent =
+          "Não foi possível criar o pagamento. Tente novamente ou fale com o suporte.";
         btnCheckout.disabled = false;
       }
     });
+
+    // Inicializa o MP assim que carregar a página
+    initMercadoPagoSDK();
   </script>
 </body>
 </html>

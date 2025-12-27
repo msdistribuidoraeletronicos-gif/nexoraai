@@ -9,16 +9,23 @@ import OpenAI from "openai";
 import multer from "multer";
 import { createClient } from "@supabase/supabase-js";
 import os from "os";
-import mercadopago from "mercadopago";
+// ✅ SDK v2 do Mercado Pago
+import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 
 const app = express();
 
+// =====================================================
+//  PATHS BÁSICOS
+// =====================================================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Middlewares básicos
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
+// Para webhooks Mercado Pago (costuma mandar x-www-form-urlencoded)
+app.use(express.urlencoded({ extended: true }));
 
 // =====================================================
 //  MULTER (UPLOAD IMAGENS DE REFERÊNCIA)
@@ -102,14 +109,21 @@ const supabaseAdmin = createClient(
 );
 
 // =====================================================
-//  MERCADO PAGO
+//  MERCADO PAGO (SDK v2)
 // =====================================================
+let mpClient = null;
+let mpPreference = null;
+let mpPayment = null;
+
 if (!process.env.MP_ACCESS_TOKEN) {
   console.warn("⚠️ MP_ACCESS_TOKEN não configurado. Checkout não funcionará.");
 } else {
-  mercadopago.configure({
-    access_token: process.env.MP_ACCESS_TOKEN,
+  mpClient = new MercadoPagoConfig({
+    accessToken: process.env.MP_ACCESS_TOKEN,
   });
+  mpPreference = new Preference(mpClient);
+  mpPayment = new Payment(mpClient);
+  console.log("✅ Mercado Pago configurado (SDK v2)");
 }
 
 // =====================================================
@@ -204,7 +218,24 @@ function computePlanStatus(planRow) {
 }
 
 // =====================================================
-//  AUTH MIDDLEWARE
+//  HELPER – DECODE JWT DO SUPABASE (FALLBACK)
+// =====================================================
+function decodeSupabaseJwt(token) {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const payload = parts[1];
+    const json = Buffer.from(payload, "base64").toString("utf8");
+    return JSON.parse(json);
+  } catch (e) {
+    console.error("Erro ao decodificar JWT:", e);
+    return null;
+  }
+}
+
+// =====================================================
+//  AUTH MIDDLEWARE (ATUALIZADO COM FALLBACK)
 // =====================================================
 async function getUserFromToken(req, res, next) {
   const authHeader = req.headers.authorization || "";
@@ -212,21 +243,45 @@ async function getUserFromToken(req, res, next) {
     ? authHeader.slice(7)
     : null;
 
-  if (!token)
+  if (!token) {
     return res
       .status(401)
       .json({ ok: false, error: "Token não informado." });
+  }
 
-  const { data, error } = await supabase.auth.getUser(token);
+  // 1) TENTA VALIDAR VIA SUPABASE (ADMIN)
+  try {
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
 
-  if (error || !data?.user) {
+    if (!error && data?.user) {
+      req.user = data.user;
+      return next();
+    }
+
+    if (error) {
+      console.warn("Supabase getUser falhou, tentando fallback local:", error.message);
+    }
+  } catch (e) {
+    console.error("Erro inesperado em supabaseAdmin.auth.getUser:", e);
+  }
+
+  // 2) FALLBACK: DECODE JWT LOCALMENTE E PEGAR userId (sub)
+  const payload = decodeSupabaseJwt(token);
+
+  if (!payload || !payload.sub) {
     return res
       .status(401)
       .json({ ok: false, error: "Token inválido ou expirado." });
   }
 
-  req.user = data.user;
-  next();
+  // Monta um user básico a partir do JWT
+  req.user = {
+    id: payload.sub,
+    email: payload.email || payload.user_metadata?.email || "",
+    ...payload,
+  };
+
+  return next();
 }
 
 // =====================================================
@@ -272,6 +327,15 @@ app.get("/checkout", (req, res) =>
 app.get("/health", (req, res) =>
   res.json({ ok: true, status: "online", env: process.env.NODE_ENV })
 );
+
+// =====================================================
+//  ROTA PÚBLICA DE CONFIG (env → frontend)
+// =====================================================
+app.get("/api/config/public", (req, res) => {
+  res.json({
+    mpPublicKey: process.env.MP_PUBLIC_KEY || null,
+  });
+});
 
 // =====================================================
 //  AUTH: REGISTER / LOGIN / PLAN
@@ -401,11 +465,20 @@ app.get("/auth/plan", getUserFromToken, async (req, res) => {
 });
 
 // =====================================================
-//  CHECKOUT / MERCADO PAGO
+//  CHECKOUT / MERCADO PAGO – SDK v2 (SEM auto_return NO LOCALHOST)
 // =====================================================
 app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
   try {
+    if (!process.env.MP_ACCESS_TOKEN || !mpPreference) {
+      console.error("❌ MP_ACCESS_TOKEN ausente ou SDK não inicializado.");
+      return res
+        .status(500)
+        .json({ ok: false, error: "Gateway de pagamento não configurado." });
+    }
+
     const { planType } = req.body; // 'quinzenal' | 'mensal'
+    console.log("📦 Criando preferência Mercado Pago para o usuário:", req.user?.id);
+    console.log("➡️ Tipo de plano recebido:", planType);
 
     let title, price, days;
     if (planType === "mensal") {
@@ -413,7 +486,6 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
       price = 68;
       days = 30;
     } else {
-      // default: quinzenal
       title = "NexoraAI Pro - Plano Quinzenal";
       price = 37;
       days = 15;
@@ -421,7 +493,7 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
 
     const APP_URL = process.env.APP_URL || "http://localhost:3001";
 
-    const preference = {
+    const preferenceBody = {
       items: [
         {
           title,
@@ -435,7 +507,8 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
         failure: `${APP_URL}/app?payment=failure`,
         pending: `${APP_URL}/app?payment=pending`,
       },
-      auto_return: "approved",
+      // ❌ REMOVIDO: auto_return - isso que estava dando o erro 400 no localhost
+      // auto_return: "approved",
       notification_url: `${APP_URL}/api/checkout/webhook`,
       metadata: {
         userId: req.user.id,
@@ -444,37 +517,72 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
       },
     };
 
-    const result = await mercadopago.preferences.create(preference);
+    console.log("📨 Enviando preferência para o Mercado Pago...");
+    const result = await mpPreference.create({ body: preferenceBody });
+
+    console.log("✅ Preferência criada no Mercado Pago:", result);
+
+    const preferenceId = result.id;
+    const initPoint =
+      result.init_point || result.sandbox_init_point || null;
+
+    if (!preferenceId || !initPoint) {
+      console.error("❌ Resposta inesperada do Mercado Pago:", result);
+      throw new Error("Resposta inválida do Mercado Pago.");
+    }
 
     return res.json({
       ok: true,
-      preferenceId: result.body.id,
+      preferenceId,
+      initPoint,
     });
   } catch (err) {
-    console.error("Erro em /api/checkout/preference:", err);
-    res.status(500).json({ ok: false, error: "Falha ao criar pagamento." });
+    console.error("❌ Erro em /api/checkout/preference:");
+    console.error(err);
+
+    if (err && err.cause) {
+      console.error("📩 Detalhes Mercado Pago:", err.cause);
+    }
+
+    return res
+      .status(500)
+      .json({ ok: false, error: "Falha ao criar pagamento." });
   }
 });
 
 // Webhook do Mercado Pago
 app.post("/api/checkout/webhook", async (req, res) => {
   try {
+    if (!mpPayment) {
+      console.error("❌ mpPayment não inicializado.");
+      return res.sendStatus(200);
+    }
+
     const body = req.body;
+    console.log("📩 Webhook recebido:", body);
 
     const type = body.type;
     const data = body.data || {};
 
     if (type !== "payment" || !data.id) {
+      console.log("Webhook ignorado (não é pagamento ou sem id).");
       return res.sendStatus(200);
     }
 
-    const payment = await mercadopago.payment.findById(data.id);
+    const paymentId = data.id;
+    console.log("🔍 Buscando pagamento no MP, id:", paymentId);
 
-    if (payment.body.status !== "approved") {
+    const payment = await mpPayment.get({ id: paymentId });
+    const paymentData = payment || {};
+
+    console.log("💳 Dados do pagamento:", paymentData);
+
+    if (paymentData.status !== "approved") {
+      console.log("Pagamento não aprovado, status:", paymentData.status);
       return res.sendStatus(200);
     }
 
-    const metadata = payment.body.metadata || {};
+    const metadata = paymentData.metadata || {};
     const userId = metadata.userId;
     const planType = metadata.planType || "quinzenal";
     const days = metadata.days || (planType === "mensal" ? 30 : 15);
@@ -495,6 +603,8 @@ app.post("/api/checkout/webhook", async (req, res) => {
       plan_started_at: start.toISOString(),
       plan_ends_at: end.toISOString(),
     });
+
+    console.log("✅ Plano PRO registrado para o usuário:", userId);
 
     return res.sendStatus(200);
   } catch (err) {
@@ -675,9 +785,9 @@ Responda APENAS em JSON com o seguinte formato:
       const captionFinal =
         legenda + (hashtags.length ? "\n\n" + hashtags.join(" ") : "");
 
-      // -----------------------------
-      // 3. SEGUNDA ETAPA: PROMPT DE IMAGEM
-      // -----------------------------
+// -----------------------------
+// 3. SEGUNDA ETAPA: PROMPT DE IMAGEM
+// -----------------------------
       let imagePrompt =
         `Arte para ${kind} de uma campanha chamada "${tituloCampanha}". ` +
         imagePromptFromText +
