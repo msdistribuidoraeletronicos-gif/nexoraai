@@ -578,13 +578,30 @@
             U
           </div>
         </div>
-        <div class="flex-1">
-          <p class="text-sm font-semibold text-white leading-tight max-w-[140px] truncate" data-user-name>Usuário</p>
-          <p id="planLabel" class="text-xs text-slate-400">NexoraAI Pro</p>
+        <div class="flex-1 min-w-0">
+          <!-- 🔹 usado pelo JS para mostrar o nome -->
+          <p
+            id="sidebarUserName"
+            class="text-sm font-semibold text-white leading-tight max-w-[140px] truncate"
+            data-user-name
+          >
+            Usuário
+          </p>
+          <!-- 🔹 usado pelo JS para mostrar o status do plano -->
+          <p id="sidebarPlanLabel" class="text-xs text-slate-400">
+            Plano Free
+          </p>
         </div>
+        <!-- 🔹 chip de dias restantes do plano -->
+        <span
+          id="sidebarPlanChip"
+          class="ml-1 text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40 whitespace-nowrap"
+        >
+          —
+        </span>
         <button
           id="userSettingsBtn"
-          class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer"
+          class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer ml-1"
           title="Configurações"
           type="button"
         >
@@ -607,9 +624,16 @@
               U
             </div>
           </div>
-          <div class="flex-1">
-            <p class="text-sm font-semibold leading-tight max-w-[180px] truncate" data-user-name>Usuário</p>
-            <p id="planLabelProfile" class="text-[11px] text-slate-400">NexoraAI Pro</p>
+          <div class="flex-1 min-w-0">
+            <p
+              class="text-sm font-semibold leading-tight max-w-[180px] truncate"
+              data-user-name
+            >
+              Usuário
+            </p>
+            <p id="planLabelProfile" class="text-[11px] text-slate-400">
+              NexoraAI Pro
+            </p>
           </div>
         </div>
 
@@ -671,6 +695,7 @@
           </div>
           <div>
             <p class="text-[11px] text-slate-500">Logado como</p>
+            <!-- 🔹 também usa data-user-name para ser atualizado pelo JS -->
             <p class="text-sm font-semibold text-slate-900 max-w-[160px] truncate" data-user-name>Usuário</p>
           </div>
         </div>
@@ -747,7 +772,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card bg-white p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-slate-800">Último conteúdo</h3>
+            <h3 class="text-lg font-bold text-slate-800">Último conteúdo</h3>
           </div>
           <div>
             <p id="statLastType" class="text-lg font-bold text-slate-900 mb-1">—</p>
@@ -1015,7 +1040,6 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <select id="personalTypeSelect" class="w-full p-3">
                 <option value="">Selecione o tipo de conteúdo...</option>
-                <!-- opções mantidas -->
                 <option>Flyer de aniversário infantil</option>
                 <option>Flyer de aniversário adulto</option>
                 <option>Convite de aniversário simples</option>
@@ -1419,7 +1443,7 @@
               <i class="fa-solid fa-check mr-1"></i> Salvar alterações
             </button>
 
-            <!-- 🔴 NOVO: botão sair da conta dentro da página de Perfil -->
+            <!-- 🔴 Botão sair da conta dentro da página de Perfil -->
             <button
               type="button"
               onclick="document.getElementById('btnLogout')?.click()"
@@ -1629,7 +1653,7 @@
       }
     }
 
-    // ✅ NOVO: faz a engrenagem do desktop abrir/fechar o painel de usuário
+    // engrenagem → abre/fecha painel do usuário
     document.addEventListener('DOMContentLoaded', () => {
       const btn = document.getElementById('userSettingsBtn');
       const panel = document.getElementById('userProfilePanel');
@@ -1641,7 +1665,7 @@
       }
     });
 
-    // Lógica do Período de Teste
+    // Lógica visual simples do período de teste (pode ser sobrescrita pelo backend depois)
     (function initTrialBanner() {
       const TRIAL_DAYS = 5;
 

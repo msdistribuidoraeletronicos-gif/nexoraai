@@ -41,6 +41,7 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // =====================================================
 //  STORAGE LOCAL (TOKENS META / POSTS IG)
+//  (em produção na Vercel grava em /tmp)
 // =====================================================
 const STORAGE_DIR =
   process.env.NODE_ENV === "production"
@@ -111,15 +112,26 @@ const supabaseAdmin = createClient(
 // =====================================================
 //  MERCADO PAGO (SDK v2)
 // =====================================================
+// 🔑 Aqui buscamos as chaves SEMPRE do .env / Vercel
+const MP_ACCESS_TOKEN =
+  process.env.MP_ACCESS_TOKEN ||
+  process.env.MERCADOPAGO_ACCESS_TOKEN ||
+  null;
+
+const MP_PUBLIC_KEY =
+  process.env.MP_PUBLIC_KEY ||
+  process.env.MERCADOPAGO_PUBLIC_KEY ||
+  null;
+
 let mpClient = null;
 let mpPreference = null;
 let mpPayment = null;
 
-if (!process.env.MP_ACCESS_TOKEN) {
+if (!MP_ACCESS_TOKEN) {
   console.warn("⚠️ MP_ACCESS_TOKEN não configurado. Checkout não funcionará.");
 } else {
   mpClient = new MercadoPagoConfig({
-    accessToken: process.env.MP_ACCESS_TOKEN,
+    accessToken: MP_ACCESS_TOKEN,
   });
   mpPreference = new Preference(mpClient);
   mpPayment = new Payment(mpClient);
@@ -177,7 +189,10 @@ function computePlanStatus(planRow) {
     const start = new Date(planRow.plan_started_at);
     const end = new Date(planRow.plan_ends_at);
     const remainingMs = end - now;
-    const remainingDays = Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
+    const remainingDays = Math.max(
+      0,
+      Math.ceil(remainingMs / (1000 * 60 * 60 * 24))
+    );
     const active = remainingMs > 0;
 
     return {
@@ -195,7 +210,10 @@ function computePlanStatus(planRow) {
     const start = new Date(planRow.trial_started_at);
     const total = planRow.trial_days;
     const diffMs = now - start;
-    const usedDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    const usedDays = Math.max(
+      0,
+      Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    );
     const remaining = Math.max(0, total - usedDays);
     const active = remaining > 0;
 
@@ -259,7 +277,10 @@ async function getUserFromToken(req, res, next) {
     }
 
     if (error) {
-      console.warn("Supabase getUser falhou, tentando fallback local:", error.message);
+      console.warn(
+        "Supabase getUser falhou, tentando fallback local:",
+        error.message
+      );
     }
   } catch (e) {
     console.error("Erro inesperado em supabaseAdmin.auth.getUser:", e);
@@ -332,8 +353,14 @@ app.get("/health", (req, res) =>
 //  ROTA PÚBLICA DE CONFIG (env → frontend)
 // =====================================================
 app.get("/api/config/public", (req, res) => {
-  res.json({
-    mpPublicKey: process.env.MP_PUBLIC_KEY || null,
+  // Só pra debug (você pode comentar em produção se quiser)
+  if (!MP_PUBLIC_KEY) {
+    console.warn("⚠️ MP_PUBLIC_KEY não configurado (mpPublicKey será null).");
+  }
+
+  return res.json({
+    ok: true,
+    mpPublicKey: MP_PUBLIC_KEY || null,
   });
 });
 
@@ -465,11 +492,19 @@ app.get("/auth/plan", getUserFromToken, async (req, res) => {
 });
 
 // =====================================================
-//  CHECKOUT / MERCADO PAGO – SDK v2 (SEM auto_return NO LOCALHOST)
+//  CHECKOUT / MERCADO PAGO – SDK v2
 // =====================================================
+
+// Helper pra pegar APP_URL (local, Vercel ou env)
+function getAppUrl() {
+  if (process.env.APP_URL) return process.env.APP_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3001";
+}
+
 app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
   try {
-    if (!process.env.MP_ACCESS_TOKEN || !mpPreference) {
+    if (!MP_ACCESS_TOKEN || !mpPreference) {
       console.error("❌ MP_ACCESS_TOKEN ausente ou SDK não inicializado.");
       return res
         .status(500)
@@ -477,7 +512,10 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
     }
 
     const { planType } = req.body; // 'quinzenal' | 'mensal'
-    console.log("📦 Criando preferência Mercado Pago para o usuário:", req.user?.id);
+    console.log(
+      "📦 Criando preferência Mercado Pago para o usuário:",
+      req.user?.id
+    );
     console.log("➡️ Tipo de plano recebido:", planType);
 
     let title, price, days;
@@ -491,7 +529,7 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
       days = 15;
     }
 
-    const APP_URL = process.env.APP_URL || "http://localhost:3001";
+    const APP_URL = getAppUrl();
 
     const preferenceBody = {
       items: [
@@ -507,8 +545,7 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
         failure: `${APP_URL}/app?payment=failure`,
         pending: `${APP_URL}/app?payment=pending`,
       },
-      // ❌ REMOVIDO: auto_return - isso que estava dando o erro 400 no localhost
-      // auto_return: "approved",
+      // auto_return: "approved", // em prod você pode ativar se quiser
       notification_url: `${APP_URL}/api/checkout/webhook`,
       metadata: {
         userId: req.user.id,
@@ -523,8 +560,7 @@ app.post("/api/checkout/preference", getUserFromToken, async (req, res) => {
     console.log("✅ Preferência criada no Mercado Pago:", result);
 
     const preferenceId = result.id;
-    const initPoint =
-      result.init_point || result.sandbox_init_point || null;
+    const initPoint = result.init_point || result.sandbox_init_point || null;
 
     if (!preferenceId || !initPoint) {
       console.error("❌ Resposta inesperada do Mercado Pago:", result);
@@ -561,15 +597,20 @@ app.post("/api/checkout/webhook", async (req, res) => {
     const body = req.body;
     console.log("📩 Webhook recebido:", body);
 
-    const type = body.type;
-    const data = body.data || {};
+    // Suporta diferentes formatos de webhook (type/data.id ou id/topic)
+    let paymentId = null;
 
-    if (type !== "payment" || !data.id) {
-      console.log("Webhook ignorado (não é pagamento ou sem id).");
+    if (body?.data && body.data.id) {
+      paymentId = body.data.id;
+    } else if (body?.id) {
+      paymentId = body.id;
+    }
+
+    if (!paymentId) {
+      console.log("Webhook ignorado: sem paymentId claro.");
       return res.sendStatus(200);
     }
 
-    const paymentId = data.id;
     console.log("🔍 Buscando pagamento no MP, id:", paymentId);
 
     const payment = await mpPayment.get({ id: paymentId });
@@ -577,8 +618,9 @@ app.post("/api/checkout/webhook", async (req, res) => {
 
     console.log("💳 Dados do pagamento:", paymentData);
 
-    if (paymentData.status !== "approved") {
-      console.log("Pagamento não aprovado, status:", paymentData.status);
+    const status = paymentData.status;
+    if (status !== "approved") {
+      console.log("Pagamento não aprovado, status:", status);
       return res.sendStatus(200);
     }
 
@@ -785,9 +827,9 @@ Responda APENAS em JSON com o seguinte formato:
       const captionFinal =
         legenda + (hashtags.length ? "\n\n" + hashtags.join(" ") : "");
 
-// -----------------------------
-// 3. SEGUNDA ETAPA: PROMPT DE IMAGEM
-// -----------------------------
+      // -----------------------------
+      // 3. SEGUNDA ETAPA: PROMPT DE IMAGEM
+      // -----------------------------
       let imagePrompt =
         `Arte para ${kind} de uma campanha chamada "${tituloCampanha}". ` +
         imagePromptFromText +

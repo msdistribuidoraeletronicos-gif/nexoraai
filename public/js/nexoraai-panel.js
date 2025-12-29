@@ -8,6 +8,16 @@ if (!localStorage.getItem("nexoraai_token")) {
 // URL do backend (como está rodando tudo no mesmo domínio/porta, pode ficar vazio)
 const API_BASE_URL = "";
 
+// Helper seguro para randomUUID no navegador/Node
+function safeRandomId() {
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+  } catch (_) {}
+  return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+}
+
 // ==========================================================
 //  HELPERS GERAIS
 // ==========================================================
@@ -248,13 +258,17 @@ function checkPlanBeforeGenerate() {
 
 function logoutStratAI() {
   try {
+    // guarda as chaves antes de limpar user_id
+    const bKey = brandsKey();
+    const gKey = generationsKey();
+
     localStorage.removeItem("nexoraai_token");
     localStorage.removeItem("nexoraai_user_id");
     localStorage.removeItem("nexoraai_user_name");
     localStorage.removeItem("nexoraai_user_email");
     localStorage.removeItem("nexoraai_plan");
-    localStorage.removeItem(brandsKey());
-    localStorage.removeItem(generationsKey());
+    localStorage.removeItem(bKey);
+    localStorage.removeItem(gKey);
   } catch (e) {
     console.error("Erro ao limpar storage:", e);
   }
@@ -321,12 +335,9 @@ document.addEventListener("DOMContentLoaded", () => {
     planLabelProfile.textContent = planLabel.textContent;
   }
 
+  // ✅ Deixa o clique da engrenagem com o script inline do HTML
+  // Aqui só controlamos clique fora para fechar o painel
   if (gearBtn && profilePanel) {
-    gearBtn.addEventListener("click", (ev) => {
-      ev.stopPropagation();
-      profilePanel.classList.toggle("hidden");
-    });
-
     document.addEventListener("click", (ev) => {
       if (
         !profilePanel.classList.contains("hidden") &&
@@ -368,7 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔹 AGORA APENAS REDIRECIONA PARA /checkout
+  // 🔹 Agora apenas redireciona para /checkout
   if (btnBillingCheckout) {
     btnBillingCheckout.addEventListener("click", () => {
       window.location.href = "/checkout";
@@ -611,10 +622,7 @@ window.downloadTemplateImage = function () {
 //  MARCAS
 // ==========================================================
 function normalizeBrandPayload() {
-  const id =
-    (crypto && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : String(Date.now()) + Math.random();
+  const id = safeRandomId();
 
   return {
     id,
@@ -1009,10 +1017,7 @@ window.generatePersonalPost = async function () {
     briefing,
   };
 
-  const id =
-    (crypto && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : String(Date.now()) + Math.random();
+  const id = safeRandomId();
 
   const item = {
     id,
@@ -1116,11 +1121,11 @@ window.generatePostComplete = async function () {
   const fileInput = $("referenceImages");
   const recreateCheck = $("recreateCheck");
 
-  // 🔹 Pega a marca selecionada normalmente
+  // Pega a marca selecionada normalmente
   let brand = getSelectedBrand();
 
-  // 🔹 Se NÃO tiver marca e o flag da sugestão estiver ativo,
-  //     criamos uma marca genérica só para essa geração.
+  // Se NÃO tiver marca e o flag da sugestão estiver ativo,
+  // criamos uma marca genérica só para essa geração.
   if (!brand && allowNoBrandJustThisGeneration) {
     brand = {
       id: null,
@@ -1132,7 +1137,7 @@ window.generatePostComplete = async function () {
     };
   }
 
-  // 🔹 Se mesmo assim não tiver brand, exige marca (fluxo normal)
+  // Se mesmo assim não tiver brand, exige marca (fluxo normal)
   if (!brand) {
     toast("Selecione uma marca.", "error");
     $("createBrandSelect")?.focus();
@@ -1158,7 +1163,6 @@ window.generatePostComplete = async function () {
     fd.append("objective", objective);
     fd.append("briefing", briefing);
     fd.append("contentType", type);
-    // Campo 4 removido daqui também
     if (recreateCheck && recreateCheck.checked) {
       fd.append("recreateMode", "true");
     }
@@ -1206,10 +1210,7 @@ window.generatePostComplete = async function () {
     toast("Backend indisponível. Usei fallback local.", "info");
   }
 
-  const id =
-    (crypto && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : String(Date.now()) + Math.random();
+  const id = safeRandomId();
 
   const item = {
     id,
@@ -1235,7 +1236,7 @@ window.generatePostComplete = async function () {
   renderHistory();
   toast("Post completo gerado!", "success");
 
-  // 🔹 Reseta o flag, para que fora da sugestão volte a exigir marca
+  // Reseta o flag, para que fora da sugestão volte a exigir marca
   allowNoBrandJustThisGeneration = false;
 };
 
@@ -1588,7 +1589,7 @@ Texto para imagem: irei fazer essa campanha, gere uma imagem publicitária atrae
   // 5. Feedback visual e Disparo
   toast("Gerando sugestão automática...", "info");
   
-  // 🔹 Permitir gerar mesmo sem marca APENAS neste fluxo de sugestão
+  // Permitir gerar mesmo sem marca APENAS neste fluxo de sugestão
   allowNoBrandJustThisGeneration = true;
 
   // Chama a função que já existe para gerar o post
