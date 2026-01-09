@@ -748,7 +748,7 @@ IMPORTANTE:
 - O usuário marcou modo RECRIAR.
 - Recrie a cena principal das imagens enviadas, mantendo enquadramento e elementos,
   mas melhore a iluminação, cores e qualidade.
-- NÃO escreva textos na imagem.
+- use frases persuasivas.
 `.trim();
       } else if (hasRefs) {
         refImagesInfo = `
@@ -756,7 +756,7 @@ IMPORTANTE:
 - O usuário enviou imagens de referência.
 - Use as referências como base de paleta de cores, clima e estilo,
   sem copiar exatamente a cena.
-- NÃO escreva textos na imagem.
+- use frases persuasivas.
 `.trim();
       }
 
@@ -833,7 +833,7 @@ Responda APENAS em JSON com o seguinte formato:
       let imagePrompt =
         `Arte para ${kind} de uma campanha chamada "${tituloCampanha}". ` +
         imagePromptFromText +
-        " Foque na cena e no conceito, NÃO escreva textos na arte. ";
+        " Foque na cena e no conceito, use um slogan persuasivo. ";
 
       imagePrompt += `Nicho: ${negocioNicho}. Objetivo: ${objectiveFinal}. `;
 
@@ -889,7 +889,7 @@ Responda APENAS em JSON com o seguinte formato:
 app.post("/api/templates/ig-flyer", async (req, res) => {
   try {
     const { handle } = req.body;
-    const imagePrompt = `Crie um flyer moderno, profissional e chamativo para divulgação no Instagram do perfil @${handle}. Use cores vibrantes, estilo digital e NÃO escreva textos na imagem (apenas elementos visuais).`;
+    const imagePrompt = `Crie um flyer moderno, profissional e chamativo para divulgação no Instagram do perfil @${handle}. Use cores vibrantes, estilo digital e use um slogan persuasivo.`;
 
     const b64 = await generateImageWithOpenAI({
       imagePrompt,
